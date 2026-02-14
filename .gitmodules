@@ -1,0 +1,3 @@
+[submodule "garage"]
+	path = garage
+	url = https://git.deuxfleurs.fr/Deuxfleurs/garage.git
