@@ -1,7 +1,7 @@
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { adminPort } from '../utils'
 import { storeJson } from '../fileModels/store.json'
+import { generateGarageToml } from '../garageConfig'
 
 const { InputSpec, Value } = sdk
 
@@ -45,41 +45,97 @@ export const createBucket = sdk.Action.withInput(
 
   async ({ effects, input }) => {
     const store = await storeJson.read((s) => s).once()
-    const token = store?.adminToken ?? ''
+    const rpcSecret = store?.rpcSecret ?? ''
+    const adminToken = store?.adminToken ?? ''
+    const env = { GARAGE_CONFIG_FILE: '/etc/garage.toml' }
 
-    const res = await fetch(
-      `http://127.0.0.1:${adminPort}/v2/CreateBucket`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          globalAlias: input.bucketName,
-        }),
-      },
+    const garageSub = await sdk.SubContainer.of(
+      effects,
+      { imageId: 'garage' },
+      sdk.Mounts.of().mountVolume({
+        volumeId: 'main',
+        subpath: null,
+        mountpoint: '/data',
+        readonly: false,
+      }),
+      'garage-action-sub',
     )
 
-    if (!res.ok) {
-      const text = await res.text()
-      throw new Error(`Failed to create bucket: ${text}`)
+    await garageSub.writeFile(
+      '/etc/garage.toml',
+      generateGarageToml({ rpcSecret, adminToken }),
+    )
+
+    const result = await garageSub.exec(
+      ['/garage', 'bucket', 'create', input.bucketName],
+      { env },
+    )
+
+    if (result.exitCode !== 0) {
+      throw new Error(
+        `Failed to create bucket: ${result.stderr || result.stdout}`,
+      )
     }
 
-    const data = (await res.json()) as { id: string }
+    // Fetch bucket info for accurate details
+    const info = await garageSub.exec(
+      ['/garage', 'bucket', 'info', input.bucketName],
+      { env },
+    )
+    const infoOut = String(info.stdout || '')
+
+    const bucketIdMatch = infoOut.match(/Bucket:\s*([0-9a-f]+)/)
+    const objectsMatch = infoOut.match(/Objects:\s*(\d+)/)
+    const sizeMatch = infoOut.match(/Size:\s*(.+)/)
+
+    const bucketId = bucketIdMatch?.[1] ?? 'unknown'
+    const objects = objectsMatch?.[1] ?? '0'
+    const size = sizeMatch?.[1]?.trim() ?? '0 B'
 
     return {
       version: '1' as const,
       title: 'Bucket Created',
       message: `Bucket "${input.bucketName}" created successfully.`,
       result: {
-        type: 'single',
-        name: 'Bucket ID',
-        description: null,
-        value: data.id,
-        masked: false,
-        copyable: true,
-        qr: false,
+        type: 'group' as const,
+        value: [
+          {
+            type: 'single' as const,
+            name: 'Bucket Name',
+            description: null,
+            value: input.bucketName,
+            masked: false,
+            copyable: true,
+            qr: false,
+          },
+          {
+            type: 'single' as const,
+            name: 'Bucket ID',
+            description: null,
+            value: bucketId,
+            masked: false,
+            copyable: true,
+            qr: false,
+          },
+          {
+            type: 'single' as const,
+            name: 'Objects',
+            description: null,
+            value: objects,
+            masked: false,
+            copyable: false,
+            qr: false,
+          },
+          {
+            type: 'single' as const,
+            name: 'Size',
+            description: null,
+            value: size,
+            masked: false,
+            copyable: false,
+            qr: false,
+          },
+        ],
       },
     }
   },

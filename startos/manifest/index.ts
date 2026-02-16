@@ -5,18 +5,18 @@ export const manifest = setupManifest({
   id: 'garage',
   title: 'Garage',
   license: 'AGPL-3.0',
-  wrapperRepo: 'https://github.com/Start9Labs/garage-startos',
+  wrapperRepo: 'https://github.com/jessemarkowitz/garage-startos',
   upstreamRepo: 'https://git.deuxfleurs.fr/Deuxfleurs/garage',
   supportSite: 'https://garagehq.deuxfleurs.fr/',
   marketingSite: 'https://garagehq.deuxfleurs.fr/',
   donationUrl: null,
-  docsUrl: 'https://garagehq.deuxfleurs.fr/documentation/quick-start/',
+  docsUrl: 'https://github.com/jessemarkowitz/garage-startos/instructions.md/',
   description: { short, long },
   volumes: ['main'],
   images: {
     garage: {
       source: {
-        dockerTag: 'dxflrs/garage:v2.2.0',
+        dockerBuild: {},
       },
       arch: ['x86_64', 'aarch64'],
     },

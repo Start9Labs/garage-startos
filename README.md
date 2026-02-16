@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="icon.png" alt="Hello World Logo" width="21%">
+  <img src="icon.png" alt="Garage Logo" width="21%">
 </p>
 
-# Hello World on StartOS
+# Garage on StartOS
 
-> **Upstream repo:** <https://github.com/Start9Labs/hello-world>
+> **Upstream repo:** <https://git.deuxfleurs.fr/Deuxfleurs/garage>
 
-A minimal reference service for StartOS. It displays a simple web page — nothing more. Use [this repository](https://github.com/Start9Labs/hello-world-startos) as a template when packaging a new service for StartOS.
+An S3-compatible distributed object storage service for StartOS, powered by [Garage](https://garagehq.deuxfleurs.fr/). Garage provides a lightweight, self-hosted alternative to Amazon S3 for storing files, backups, and application data.
 
 ---
 
@@ -14,25 +14,36 @@ A minimal reference service for StartOS. It displays a simple web page — nothi
 
 | Property | Value |
 |----------|-------|
-| Image | `ghcr.io/start9labs/hello-world:2.0.0` |
-| Architectures | x86_64, aarch64, riscv64 |
-| Entrypoint | `hello-world` |
+| Image | `dxflrs/garage:v2.2.0` |
+| Architectures | x86_64, aarch64 |
+| Entrypoint | `/garage server` |
 
 ## Volumes
 
 | Volume | Mount Point | Purpose |
 |--------|-------------|---------|
-| `main` | `/data` | Persistent data |
+| `main` | `/data` | Persistent data and metadata storage |
 
 ## Network Interfaces
 
 | Interface | Port | Protocol | Purpose |
 |-----------|------|----------|---------|
-| Web UI | 80 | HTTP | Hello World web page |
+| S3 API | 3900 | HTTP | S3-compatible object storage API |
+| Admin API | 3903 | HTTP | Garage administration API |
 
 ## Actions
 
-None.
+| Action | Description |
+|--------|-------------|
+| Get Admin Token | Retrieve the admin API token |
+| Create Bucket | Create a new S3 bucket |
+| Create API Key | Create a new S3 API key pair |
+| List Buckets | List all S3 buckets with authorized keys |
+| List API Keys | List all S3 API keys with bucket access |
+| Delete Bucket | Delete an S3 bucket by name |
+| Delete API Key | Delete an S3 API key by its key ID |
+| Grant Key Access to Bucket | Grant an API key read/write access to a bucket |
+| Grant Bucket Access to Key | Allow a specific API key to access a bucket |
 
 ## Dependencies
 
@@ -46,7 +57,8 @@ The `main` volume is backed up.
 
 | Check | Method | Messages |
 |-------|--------|----------|
-| Web Interface | Port listening (80) | Ready: "The web interface is ready" |
+| S3 API | Port listening (3900) | Ready: "The S3 API is ready" |
+| Admin API | Port listening (3903) | Ready: "The Admin API is ready" |
 
 ---
 
@@ -59,18 +71,29 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development wo
 ## Quick Reference for AI Consumers
 
 ```yaml
-package_id: hello-world
-upstream_version: 2.0.0
-image: ghcr.io/start9labs/hello-world:2.0.0
-architectures: [x86_64, aarch64, riscv64]
+package_id: garage
+upstream_version: 2.2.0
+image: dxflrs/garage:v2.2.0
+architectures: [x86_64, aarch64]
 volumes:
   main: /data
 ports:
-  ui: 80
+  s3_api: 3900
+  admin_api: 3903
 dependencies: none
-actions: []
+actions:
+  - get-admin-token
+  - create-bucket
+  - create-api-key
+  - list-buckets
+  - list-api-keys
+  - delete-bucket
+  - delete-api-key
+  - grant-key-to-bucket
+  - grant-bucket-to-key
 health_checks:
-  - port_listening: 80
+  - port_listening: 3900
+  - port_listening: 3903
 backup_volumes:
   - main
 ```

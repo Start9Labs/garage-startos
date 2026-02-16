@@ -24,6 +24,18 @@ const dict = {
   'List API Keys': 15,
   'List all S3 API keys': 16,
   'Retrieve the admin API token': 17,
+  'Delete API Key': 18,
+  'Delete an S3 API key by its key ID': 19,
+  'This will permanently delete the API key.': 20,
+  'Delete Bucket': 21,
+  'Delete an S3 bucket by name': 22,
+  'This will permanently delete the bucket and all its contents.': 23,
+  'Grant Key Access to Bucket': 24,
+  'Grant an API key read/write access to a specific bucket': 25,
+  'Grant Bucket Access to Key': 26,
+  'Allow a specific API key to access a bucket': 27,
+  'The Admin API is ready': 28,
+  'The Admin API is not ready': 29,
 } as const
 
 /**

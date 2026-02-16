@@ -4,6 +4,10 @@ import { createBucket } from './createBucket'
 import { createApiKey } from './createApiKey'
 import { listBuckets } from './listBuckets'
 import { listApiKeys } from './listApiKeys'
+import { deleteApiKey } from './deleteApiKey'
+import { deleteBucket } from './deleteBucket'
+import { grantKeyToBucket } from './grantKeyToBucket'
+import { grantBucketToKey } from './grantBucketToKey'
 
 export const actions = sdk.Actions.of()
   .addAction(getAdminToken)
@@ -11,3 +15,7 @@ export const actions = sdk.Actions.of()
   .addAction(createApiKey)
   .addAction(listBuckets)
   .addAction(listApiKeys)
+  .addAction(deleteApiKey)
+  .addAction(deleteBucket)
+  .addAction(grantKeyToBucket)
+  .addAction(grantBucketToKey)

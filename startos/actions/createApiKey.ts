@@ -1,7 +1,7 @@
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { adminPort } from '../utils'
 import { storeJson } from '../fileModels/store.json'
+import { generateGarageToml } from '../garageConfig'
 
 const { InputSpec, Value } = sdk
 
@@ -39,31 +39,43 @@ export const createApiKey = sdk.Action.withInput(
 
   async ({ effects, input }) => {
     const store = await storeJson.read((s) => s).once()
-    const token = store?.adminToken ?? ''
+    const rpcSecret = store?.rpcSecret ?? ''
+    const adminToken = store?.adminToken ?? ''
 
-    const res = await fetch(
-      `http://127.0.0.1:${adminPort}/v2/CreateKey`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: input.keyName,
-        }),
-      },
+    const garageSub = await sdk.SubContainer.of(
+      effects,
+      { imageId: 'garage' },
+      sdk.Mounts.of().mountVolume({
+        volumeId: 'main',
+        subpath: null,
+        mountpoint: '/data',
+        readonly: false,
+      }),
+      'garage-action-sub',
     )
 
-    if (!res.ok) {
-      const text = await res.text()
-      throw new Error(`Failed to create API key: ${text}`)
+    await garageSub.writeFile(
+      '/etc/garage.toml',
+      generateGarageToml({ rpcSecret, adminToken }),
+    )
+
+    const result = await garageSub.exec(
+      ['/garage', 'key', 'create', input.keyName],
+      { env: { GARAGE_CONFIG_FILE: '/etc/garage.toml' } },
+    )
+
+    if (result.exitCode !== 0) {
+      throw new Error(
+        `Failed to create API key: ${result.stderr || result.stdout}`,
+      )
     }
 
-    const data = (await res.json()) as {
-      accessKeyId: string
-      secretAccessKey: string
-    }
+    const stdout = String(result.stdout || '')
+    const accessKeyMatch = stdout.match(/Key ID:\s*(\S+)/)
+    const secretKeyMatch = stdout.match(/Secret key:\s*(\S+)/)
+
+    const accessKeyId = accessKeyMatch?.[1] ?? 'See output'
+    const secretAccessKey = secretKeyMatch?.[1] ?? 'See output'
 
     return {
       version: '1' as const,
@@ -76,7 +88,7 @@ export const createApiKey = sdk.Action.withInput(
             type: 'single',
             name: 'Access Key ID',
             description: null,
-            value: data.accessKeyId,
+            value: accessKeyId,
             masked: false,
             copyable: true,
             qr: false,
@@ -85,7 +97,7 @@ export const createApiKey = sdk.Action.withInput(
             type: 'single',
             name: 'Secret Access Key',
             description: null,
-            value: data.secretAccessKey,
+            value: secretAccessKey,
             masked: true,
             copyable: true,
             qr: false,

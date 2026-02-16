@@ -25,13 +25,13 @@ export const long = {
 
 export const alertInstall = {
   en_US:
-    'After installation, use the "Get Admin Token" action to retrieve your admin API token. Use the "Create Bucket" and "Create API Key" actions to set up storage.',
+    'After installation, use the Actions to get your admin token, to create API keys and buckets, display API keys and buckets, and to give bucket permissions to API keys.',
   es_ES:
-    'Después de la instalación, use la acción "Obtener token de administrador" para recuperar su token de API de administrador. Use las acciones "Crear bucket" y "Crear clave API" para configurar el almacenamiento.',
+    'Después de la instalación, use las Acciones para obtener su token de administrador, crear claves API y buckets, mostrar claves API y buckets, y asignar permisos de buckets a claves API.',
   de_DE:
-    'Verwenden Sie nach der Installation die Aktion "Admin-Token abrufen", um Ihr Admin-API-Token abzurufen. Verwenden Sie die Aktionen "Bucket erstellen" und "API-Schlüssel erstellen", um den Speicher einzurichten.',
+    'Verwenden Sie nach der Installation die Aktionen, um Ihr Admin-Token abzurufen, API-Schlüssel und Buckets zu erstellen, API-Schlüssel und Buckets anzuzeigen und Bucket-Berechtigungen an API-Schlüssel zu vergeben.',
   pl_PL:
-    'Po instalacji użyj akcji "Pobierz token administratora", aby uzyskać token API administratora. Użyj akcji "Utwórz bucket" i "Utwórz klucz API", aby skonfigurować magazyn.',
+    'Po instalacji użyj Akcji, aby pobrać token administratora, utworzyć klucze API i buckety, wyświetlić klucze API i buckety oraz przyznać uprawnienia do bucketów kluczom API.',
   fr_FR:
-    "Après l'installation, utilisez l'action « Obtenir le jeton admin » pour récupérer votre jeton API admin. Utilisez les actions « Créer un bucket » et « Créer une clé API » pour configurer le stockage.",
+    "Après l'installation, utilisez les Actions pour obtenir votre jeton admin, créer des clés API et des buckets, afficher les clés API et les buckets, et attribuer des permissions de buckets aux clés API.",
 }
