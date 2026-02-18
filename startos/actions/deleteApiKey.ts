@@ -1,22 +1,43 @@
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
-import { generateGarageToml } from '../garageConfig'
+import { createGarageSub, parseKeyList } from './garageSubContainer'
 
 const { InputSpec, Value } = sdk
 
 const inputSpec = InputSpec.of({
-  keyId: Value.text({
-    name: 'Key ID',
-    description:
-      'The key ID to delete (starts with GK). Use "List API Keys" to find it.',
-    required: true,
-    default: null,
-    placeholder: 'GK...',
-    minLength: 1,
-    maxLength: 128,
-    patterns: [],
-    inputmode: 'text',
+  keyIds: Value.dynamicMultiselect(async ({ effects }) => {
+    const { sub, env } = await createGarageSub(effects)
+    const result = await sub.exec(['/garage', 'key', 'list'], { env })
+    const keys = parseKeyList(String(result.stdout || ''))
+    keys.sort((a, b) => a.id.localeCompare(b.id))
+
+    if (keys.length === 0) {
+      return {
+        name: 'API Keys',
+        description: null,
+        warning: 'No API keys found.',
+        default: [],
+        values: { _none: 'No API keys available' } as Record<string, string>,
+        disabled: ['_none'],
+        minLength: null,
+        maxLength: null,
+      }
+    }
+
+    const values: Record<string, string> = {}
+    for (const k of keys) {
+      values[k.id] = k.name !== k.id ? `${k.id} (${k.name})` : k.id
+    }
+
+    return {
+      name: 'API Keys',
+      description: `${keys.length} key(s) available. Select one or more to delete.`,
+      warning: null,
+      default: [],
+      values,
+      minLength: 1,
+      maxLength: null,
+    }
   }),
 })
 
@@ -34,47 +55,51 @@ export const deleteApiKey = sdk.Action.withInput(
 
   inputSpec,
 
-  async ({ effects }) => ({
-    keyId: undefined,
-  }),
+  async () => null,
 
   async ({ effects, input }) => {
-    const store = await storeJson.read((s) => s).once()
-    const rpcSecret = store?.rpcSecret ?? ''
-    const adminToken = store?.adminToken ?? ''
+    if (input.keyIds.length === 0) {
+      throw new Error('No API keys selected.')
+    }
 
-    const garageSub = await sdk.SubContainer.of(
-      effects,
-      { imageId: 'garage' },
-      sdk.Mounts.of().mountVolume({
-        volumeId: 'main',
-        subpath: null,
-        mountpoint: '/data',
-        readonly: false,
-      }),
-      'garage-action-sub',
-    )
+    const { sub, env } = await createGarageSub(effects)
+    const errors: string[] = []
+    const deleted: string[] = []
 
-    await garageSub.writeFile(
-      '/etc/garage.toml',
-      generateGarageToml({ rpcSecret, adminToken }),
-    )
-
-    const result = await garageSub.exec(
-      ['/garage', 'key', 'delete', '--yes', input.keyId],
-      { env: { GARAGE_CONFIG_FILE: '/etc/garage.toml' } },
-    )
-
-    if (result.exitCode !== 0) {
-      throw new Error(
-        `Failed to delete API key: ${result.stderr || result.stdout}`,
+    for (const keyId of input.keyIds) {
+      const result = await sub.exec(
+        ['/garage', 'key', 'delete', '--yes', keyId],
+        { env },
       )
+      if (result.exitCode !== 0) {
+        errors.push(`${keyId}: ${result.stderr || result.stdout}`)
+      } else {
+        deleted.push(keyId)
+      }
+    }
+
+    if (errors.length > 0 && deleted.length === 0) {
+      throw new Error(`Failed to delete API key(s):\n${errors.join('\n')}`)
+    }
+
+    const message =
+      deleted.length === 1
+        ? `API key "${deleted[0]}" has been permanently deleted.`
+        : `${deleted.length} API keys have been permanently deleted.`
+
+    if (errors.length > 0) {
+      return {
+        version: '1' as const,
+        title: 'Partial Deletion',
+        message: `${message}\n\nFailed to delete:\n${errors.join('\n')}`,
+        result: null,
+      }
     }
 
     return {
       version: '1' as const,
-      title: 'API Key Deleted',
-      message: `API key "${input.keyId}" has been permanently deleted.`,
+      title: deleted.length === 1 ? 'API Key Deleted' : 'API Keys Deleted',
+      message,
       result: null,
     }
   },

@@ -10,7 +10,7 @@ export const manifest = setupManifest({
   supportSite: 'https://garagehq.deuxfleurs.fr/',
   marketingSite: 'https://garagehq.deuxfleurs.fr/',
   donationUrl: null,
-  docsUrl: 'https://github.com/jessemarkowitz/garage-startos/instructions.md/',
+  docsUrl: 'https://github.com/JesseMarkowitz/garage-startos/blob/main/instructions.md',
   description: { short, long },
   volumes: ['main'],
   images: {

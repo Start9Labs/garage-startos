@@ -1,34 +1,77 @@
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
-import { generateGarageToml } from '../garageConfig'
+import {
+  createGarageSub,
+  parseBucketList,
+  parseKeyList,
+} from './garageSubContainer'
 
 const { InputSpec, Value } = sdk
 
 const inputSpec = InputSpec.of({
-  bucketName: Value.text({
-    name: 'Bucket Name',
-    description:
-      'The bucket to manage access for. Use "List Buckets" to see available buckets.',
-    required: true,
-    default: null,
-    placeholder: 'my-bucket',
-    minLength: 1,
-    maxLength: 63,
-    patterns: [],
-    inputmode: 'text',
+  bucketName: Value.dynamicSelect(async ({ effects }) => {
+    const { sub, env } = await createGarageSub(effects)
+    const result = await sub.exec(['/garage', 'bucket', 'list'], { env })
+    const buckets = parseBucketList(String(result.stdout || ''))
+    buckets.sort((a, b) => a.name.localeCompare(b.name))
+
+    if (buckets.length === 0) {
+      return {
+        name: 'Bucket',
+        description: null,
+        warning: 'No buckets found. Create one first.',
+        default: '_none',
+        values: { _none: 'No buckets available' } as Record<string, string>,
+        disabled: ['_none'],
+      }
+    }
+
+    const values: Record<string, string> = {}
+    for (const b of buckets) {
+      values[b.name] = b.name
+    }
+
+    return {
+      name: 'Bucket',
+      description: 'Select the bucket to grant access to',
+      warning: null,
+      default: buckets[0].name,
+      values,
+    }
   }),
-  keyId: Value.text({
-    name: 'API Key ID',
-    description:
-      'The key ID to grant access to (starts with GK). Use "List API Keys" to find it.',
-    required: true,
-    default: null,
-    placeholder: 'GK...',
-    minLength: 1,
-    maxLength: 128,
-    patterns: [],
-    inputmode: 'text',
+  keyIds: Value.dynamicMultiselect(async ({ effects }) => {
+    const { sub, env } = await createGarageSub(effects)
+    const result = await sub.exec(['/garage', 'key', 'list'], { env })
+    const keys = parseKeyList(String(result.stdout || ''))
+    keys.sort((a, b) => a.id.localeCompare(b.id))
+
+    if (keys.length === 0) {
+      return {
+        name: 'API Keys',
+        description: null,
+        warning: 'No API keys found. Create one first.',
+        default: [],
+        values: { _none: 'No API keys available' } as Record<string, string>,
+        disabled: ['_none'],
+        minLength: null,
+        maxLength: null,
+      }
+    }
+
+    const values: Record<string, string> = {}
+    for (const k of keys) {
+      values[k.id] = k.name !== k.id ? `${k.id} (${k.name})` : k.id
+    }
+
+    return {
+      name: 'API Keys',
+      description: `${keys.length} key(s) available. Select one or more to grant access.`,
+      warning: null,
+      default: [],
+      values,
+      minLength: 1,
+      maxLength: null,
+    }
   }),
   read: Value.toggle({
     name: 'Read',
@@ -53,9 +96,7 @@ export const grantBucketToKey = sdk.Action.withInput(
 
   async ({ effects }) => ({
     name: i18n('Grant Bucket Access to Key'),
-    description: i18n(
-      'Allow a specific API key to access a bucket',
-    ),
+    description: i18n('Allow a specific API key to access a bucket'),
     warning: null,
     allowedStatuses: 'only-running',
     group: null,
@@ -64,36 +105,18 @@ export const grantBucketToKey = sdk.Action.withInput(
 
   inputSpec,
 
-  async ({ effects }) => ({
-    bucketName: undefined,
-    keyId: undefined,
-    read: true,
-    write: true,
-    owner: false,
-  }),
+  async () => null,
 
   async ({ effects, input }) => {
-    const store = await storeJson.read((s) => s).once()
-    const rpcSecret = store?.rpcSecret ?? ''
-    const adminToken = store?.adminToken ?? ''
-    const env = { GARAGE_CONFIG_FILE: '/etc/garage.toml' }
+    if (input.bucketName === '_none') {
+      throw new Error(
+        'Please create buckets before granting access.',
+      )
+    }
 
-    const garageSub = await sdk.SubContainer.of(
-      effects,
-      { imageId: 'garage' },
-      sdk.Mounts.of().mountVolume({
-        volumeId: 'main',
-        subpath: null,
-        mountpoint: '/data',
-        readonly: false,
-      }),
-      'garage-action-sub',
-    )
-
-    await garageSub.writeFile(
-      '/etc/garage.toml',
-      generateGarageToml({ rpcSecret, adminToken }),
-    )
+    if (input.keyIds.length === 0) {
+      throw new Error('Please select at least one API key.')
+    }
 
     if (!input.read && !input.write && !input.owner) {
       throw new Error(
@@ -101,19 +124,7 @@ export const grantBucketToKey = sdk.Action.withInput(
       )
     }
 
-    const args = ['/garage', 'bucket', 'allow', input.bucketName]
-    if (input.read) args.push('--read')
-    if (input.write) args.push('--write')
-    if (input.owner) args.push('--owner')
-    args.push('--key', input.keyId)
-
-    const result = await garageSub.exec(args, { env })
-
-    if (result.exitCode !== 0) {
-      throw new Error(
-        `Failed to grant access: ${result.stderr || result.stdout}`,
-      )
-    }
+    const { sub, env } = await createGarageSub(effects)
 
     const perms = [
       input.read ? 'Read' : null,
@@ -123,10 +134,65 @@ export const grantBucketToKey = sdk.Action.withInput(
       .filter(Boolean)
       .join(', ')
 
+    const errors: string[] = []
+    const granted: string[] = []
+
+    for (const keyId of input.keyIds) {
+      // Allow checked permissions
+      const allowArgs = ['/garage', 'bucket', 'allow', input.bucketName]
+      if (input.read) allowArgs.push('--read')
+      if (input.write) allowArgs.push('--write')
+      if (input.owner) allowArgs.push('--owner')
+      allowArgs.push('--key', keyId)
+
+      const allowResult = await sub.exec(allowArgs, { env })
+      if (allowResult.exitCode !== 0) {
+        errors.push(`${keyId}: ${allowResult.stderr || allowResult.stdout}`)
+        continue
+      }
+
+      // Deny unchecked permissions to revoke any previously granted access
+      const denyArgs = ['/garage', 'bucket', 'deny', input.bucketName]
+      if (!input.read) denyArgs.push('--read')
+      if (!input.write) denyArgs.push('--write')
+      if (!input.owner) denyArgs.push('--owner')
+
+      if (denyArgs.length > 4) {
+        denyArgs.push('--key', keyId)
+        const denyResult = await sub.exec(denyArgs, { env })
+        if (denyResult.exitCode !== 0) {
+          errors.push(
+            `${keyId} (deny): ${denyResult.stderr || denyResult.stdout}`,
+          )
+          continue
+        }
+      }
+
+      granted.push(keyId)
+    }
+
+    if (errors.length > 0 && granted.length === 0) {
+      throw new Error(`Failed to grant access:\n${errors.join('\n')}`)
+    }
+
+    const message =
+      granted.length === 1
+        ? `Key "${granted[0]}" now has ${perms} access to bucket "${input.bucketName}".`
+        : `${granted.length} keys now have ${perms} access to bucket "${input.bucketName}".`
+
+    if (errors.length > 0) {
+      return {
+        version: '1' as const,
+        title: 'Partial Grant',
+        message: `${message}\n\nFailed to grant:\n${errors.join('\n')}`,
+        result: null,
+      }
+    }
+
     return {
       version: '1' as const,
       title: 'Access Granted',
-      message: `Key "${input.keyId}" now has ${perms} access to bucket "${input.bucketName}".`,
+      message,
       result: null,
     }
   },
