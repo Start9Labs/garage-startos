@@ -11,7 +11,7 @@ export const listBuckets = sdk.Action.withoutInput(
     description: i18n('List all S3 buckets'),
     warning: null,
     allowedStatuses: 'only-running',
-    group: null,
+    group: 'Buckets',
     visibility: 'enabled',
   }),
 

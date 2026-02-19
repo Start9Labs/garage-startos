@@ -4,7 +4,7 @@
 
 # Garage on StartOS
 
-[Garage](https://garagehq.deuxfleurs.fr/) is an S3-compatible distributed object storage service for StartOS. It provides alightweight, self-hosted alternative to Amazon S3 for storing files, backups, and application data.
+[Garage](https://garagehq.deuxfleurs.fr/) is an S3-compatible distributed object storage service for StartOS. It provides a lightweight, self-hosted alternative to Amazon S3 for storing files, backups, and application data.
 
 ---
 
@@ -32,16 +32,7 @@ To access you will need to provide:
 ## Support
 Please enter any issues or enhancement requests at [https://github.com/JesseMarkowitz/garage-startos/issues](https://github.com/JesseMarkowitz/garage-startos/issues)
 
-#   AWS_SECRET_ACCESS_KEY="..." \
-#   S3_BUCKET="my-test-bucket" \ Before launching the UI, you can configure key system settings directly from the StartOS service page. Go to Actions and then Configure Mattermost Options to adjust the following:
-
-Site URL – Enter the URL that Mattermost should use to generate links (e.g., for email notifications or chat links).
-Server Timezone – Set the server's local time for accurate logs and timestamps.
-Enable Plugin Uploads – Toggle this option to allow the installation of custom plugins within the System Console.
-Telemetry – Configure the three telemetry settings to control whether usage data is reported to Mattermost.  
-
-
- | Property | Value |
+| Property | Value |
 |----------|-------|
 | Image | `dxflrs/garage:v2.2.0` |
 | Architectures | x86_64, aarch64 |
@@ -71,8 +62,8 @@ Telemetry – Configure the three telemetry settings to control whether usage da
 | List API Keys | List all S3 API keys with bucket access |
 | Delete Bucket | Delete an S3 bucket by name |
 | Delete API Key | Delete an S3 API key by its key ID |
-| Grant Key Access to Bucket | Grant an API key read/write access to a bucket |
-| Grant Bucket Access to Key | Allow a specific API key to access a bucket |
+| Grant Key Access to Buckets | Grant an API key read/write access to a bucket |
+| Grant Bucket Access to Keys | Allow a specific API key to access a bucket |
 
 ## Dependencies
 

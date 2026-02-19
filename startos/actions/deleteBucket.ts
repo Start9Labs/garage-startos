@@ -51,7 +51,7 @@ export const deleteBucket = sdk.Action.withInput(
       'This will permanently delete the bucket and all its contents.',
     ),
     allowedStatuses: 'only-running',
-    group: null,
+    group: 'Buckets',
     visibility: 'enabled',
   }),
 

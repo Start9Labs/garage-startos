@@ -33,7 +33,7 @@ export const createBucket = sdk.Action.withInput(
     description: i18n('Create a new S3 bucket'),
     warning: null,
     allowedStatuses: 'only-running',
-    group: null,
+    group: 'Buckets',
     visibility: 'enabled',
   }),
 

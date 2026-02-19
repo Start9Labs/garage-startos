@@ -49,7 +49,7 @@ export const deleteApiKey = sdk.Action.withInput(
     description: i18n('Delete an S3 API key by its key ID'),
     warning: i18n('This will permanently delete the API key.'),
     allowedStatuses: 'only-running',
-    group: null,
+    group: 'API Keys',
     visibility: 'enabled',
   }),
 

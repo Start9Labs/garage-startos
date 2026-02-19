@@ -30,12 +30,14 @@ const dict = {
   'Delete Bucket': 21,
   'Delete an S3 bucket by name': 22,
   'This will permanently delete the bucket and all its contents.': 23,
-  'Grant Key Access to Bucket': 24,
+  'Grant Key Access to Buckets': 24,
   'Grant an API key read/write access to a specific bucket': 25,
-  'Grant Bucket Access to Key': 26,
+  'Grant Bucket Access to Keys': 26,
   'Allow a specific API key to access a bucket': 27,
   'The Admin API is ready': 28,
   'The Admin API is not ready': 29,
+  'Cluster Status': 30,
+  'Show the status of the Garage cluster': 31,
 } as const
 
 /**

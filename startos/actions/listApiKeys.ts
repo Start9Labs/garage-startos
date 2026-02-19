@@ -11,7 +11,7 @@ export const listApiKeys = sdk.Action.withoutInput(
     description: i18n('List all S3 API keys'),
     warning: null,
     allowedStatuses: 'only-running',
-    group: null,
+    group: 'API Keys',
     visibility: 'enabled',
   }),
 

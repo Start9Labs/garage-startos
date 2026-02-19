@@ -27,7 +27,7 @@ export const createApiKey = sdk.Action.withInput(
     description: i18n('Create a new S3 API key pair'),
     warning: null,
     allowedStatuses: 'only-running',
-    group: null,
+    group: 'API Keys',
     visibility: 'enabled',
   }),
 

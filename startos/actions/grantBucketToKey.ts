@@ -95,11 +95,11 @@ export const grantBucketToKey = sdk.Action.withInput(
   'grant-bucket-to-key',
 
   async ({ effects }) => ({
-    name: i18n('Grant Bucket Access to Key'),
+    name: i18n('Grant Bucket Access to Keys'),
     description: i18n('Allow a specific API key to access a bucket'),
     warning: null,
     allowedStatuses: 'only-running',
-    group: null,
+    group: 'Permissions',
     visibility: 'enabled',
   }),
 
