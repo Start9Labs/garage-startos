@@ -10,7 +10,7 @@ type Effects = Parameters<typeof sdk.SubContainer.of>[0]
  * and writes garage.toml into the container.
  */
 export async function createGarageSub(effects: Effects) {
-  const store = await storeJson.read((s) => s).once()
+  const store = await storeJson.read().once()
   const rpcSecret = store?.rpcSecret ?? ''
   const adminToken = store?.adminToken ?? ''
   const env = { GARAGE_CONFIG_FILE: '/etc/garage.toml' }

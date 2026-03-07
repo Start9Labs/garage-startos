@@ -1,7 +1,6 @@
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
-import { generateGarageToml } from '../garageConfig'
+import { createGarageSub } from './garageSubContainer'
 
 export const listApiKeys = sdk.Action.withoutInput(
   'list-api-keys',
@@ -16,37 +15,11 @@ export const listApiKeys = sdk.Action.withoutInput(
   }),
 
   async ({ effects }) => {
-    const store = await storeJson.read((s) => s).once()
-    const rpcSecret = store?.rpcSecret ?? ''
-    const adminToken = store?.adminToken ?? ''
-    const env = { GARAGE_CONFIG_FILE: '/etc/garage.toml' }
+    const { sub: garageSub, env } = await createGarageSub(effects)
 
-    const garageSub = await sdk.SubContainer.of(
-      effects,
-      { imageId: 'garage' },
-      sdk.Mounts.of().mountVolume({
-        volumeId: 'main',
-        subpath: null,
-        mountpoint: '/data',
-        readonly: false,
-      }),
-      'garage-action-sub',
-    )
-
-    await garageSub.writeFile(
-      '/etc/garage.toml',
-      generateGarageToml({ rpcSecret, adminToken }),
-    )
-
-    const result = await garageSub.exec(['/garage', 'key', 'list'], {
+    const result = await garageSub.execFail(['/garage', 'key', 'list'], {
       env,
     })
-
-    if (result.exitCode !== 0) {
-      throw new Error(
-        `Failed to list API keys: ${result.stderr || result.stdout}`,
-      )
-    }
 
     const output = String(result.stdout || '').trim()
     const lines = output.split('\n').filter((l) => l.trim().length > 0)

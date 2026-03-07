@@ -1,7 +1,6 @@
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
-import { generateGarageToml } from '../garageConfig'
+import { createGarageSub } from './garageSubContainer'
 
 const { InputSpec, Value } = sdk
 
@@ -38,37 +37,12 @@ export const createApiKey = sdk.Action.withInput(
   }),
 
   async ({ effects, input }) => {
-    const store = await storeJson.read((s) => s).once()
-    const rpcSecret = store?.rpcSecret ?? ''
-    const adminToken = store?.adminToken ?? ''
+    const { sub, env } = await createGarageSub(effects)
 
-    const garageSub = await sdk.SubContainer.of(
-      effects,
-      { imageId: 'garage' },
-      sdk.Mounts.of().mountVolume({
-        volumeId: 'main',
-        subpath: null,
-        mountpoint: '/data',
-        readonly: false,
-      }),
-      'garage-action-sub',
-    )
-
-    await garageSub.writeFile(
-      '/etc/garage.toml',
-      generateGarageToml({ rpcSecret, adminToken }),
-    )
-
-    const result = await garageSub.exec(
+    const result = await sub.execFail(
       ['/garage', 'key', 'create', input.keyName],
-      { env: { GARAGE_CONFIG_FILE: '/etc/garage.toml' } },
+      { env },
     )
-
-    if (result.exitCode !== 0) {
-      throw new Error(
-        `Failed to create API key: ${result.stderr || result.stdout}`,
-      )
-    }
 
     const stdout = String(result.stdout || '')
     const accessKeyMatch = stdout.match(/Key ID:\s*(\S+)/)

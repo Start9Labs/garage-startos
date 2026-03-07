@@ -1,7 +1,6 @@
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
-import { generateGarageToml } from '../garageConfig'
+import { createGarageSub } from './garageSubContainer'
 
 const { InputSpec, Value } = sdk
 
@@ -44,41 +43,15 @@ export const createBucket = sdk.Action.withInput(
   }),
 
   async ({ effects, input }) => {
-    const store = await storeJson.read((s) => s).once()
-    const rpcSecret = store?.rpcSecret ?? ''
-    const adminToken = store?.adminToken ?? ''
-    const env = { GARAGE_CONFIG_FILE: '/etc/garage.toml' }
+    const { sub, env } = await createGarageSub(effects)
 
-    const garageSub = await sdk.SubContainer.of(
-      effects,
-      { imageId: 'garage' },
-      sdk.Mounts.of().mountVolume({
-        volumeId: 'main',
-        subpath: null,
-        mountpoint: '/data',
-        readonly: false,
-      }),
-      'garage-action-sub',
-    )
-
-    await garageSub.writeFile(
-      '/etc/garage.toml',
-      generateGarageToml({ rpcSecret, adminToken }),
-    )
-
-    const result = await garageSub.exec(
+    await sub.execFail(
       ['/garage', 'bucket', 'create', input.bucketName],
       { env },
     )
 
-    if (result.exitCode !== 0) {
-      throw new Error(
-        `Failed to create bucket: ${result.stderr || result.stdout}`,
-      )
-    }
-
     // Fetch bucket info for accurate details
-    const info = await garageSub.exec(
+    const info = await sub.exec(
       ['/garage', 'bucket', 'info', input.bucketName],
       { env },
     )

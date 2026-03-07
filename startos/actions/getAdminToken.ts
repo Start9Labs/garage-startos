@@ -15,7 +15,7 @@ export const getAdminToken = sdk.Action.withoutInput(
   }),
 
   async ({ effects }) => {
-    const store = await storeJson.read((s) => s).once()
+    const store = await storeJson.read().once()
 
     return {
       version: '1' as const,

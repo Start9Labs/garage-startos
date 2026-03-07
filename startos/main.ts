@@ -6,7 +6,7 @@ import { s3ApiPort, adminPort } from './utils'
 import { generateGarageToml } from './garageConfig'
 
 export const main = sdk.setupMain(async ({ effects }) => {
-  const store = await storeJson.read((s) => s).const(effects)
+  const store = await storeJson.read().const(effects)
 
   const rpcSecret = store?.rpcSecret ?? ''
   const adminToken = store?.adminToken ?? ''

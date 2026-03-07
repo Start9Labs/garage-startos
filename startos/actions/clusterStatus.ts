@@ -66,13 +66,7 @@ export const clusterStatus = sdk.Action.withoutInput(
   async ({ effects }) => {
     const { sub, env } = await createGarageSub(effects)
 
-    const result = await sub.exec(['/garage', 'status'], { env })
-
-    if (result.exitCode !== 0) {
-      throw new Error(
-        `Failed to get cluster status: ${result.stderr || result.stdout}`,
-      )
-    }
+    const result = await sub.execFail(['/garage', 'status'], { env })
 
     const output = String(result.stdout || '').trim()
     const sections = parseStatusOutput(output)
