@@ -6,3 +6,6 @@ export const long =
 
 export const alertInstall =
   'After installation, use the Actions to get your admin token, to create API keys and buckets, display API keys and buckets, and to give bucket permissions to API keys.'
+
+export const alertRestore =
+  'After restoring from backup, the S3 API and Admin API ports may have changed. Check the Interfaces tab for the current URLs and update any clients or applications that connect to Garage.'
