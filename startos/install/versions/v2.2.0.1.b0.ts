@@ -1,7 +1,7 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
-export const v_2_2_0_0_a6 = VersionInfo.of({
-  version: '2.2.0:0-alpha.6',
+export const v_2_2_0_1_b0 = VersionInfo.of({
+  version: '2.2.0:1-beta.0',
   releaseNotes:
     'Added restore-from-backup alert warning that S3 API and Admin API ports may have changed.',
   migrations: {
