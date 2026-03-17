@@ -26,16 +26,18 @@ An S3-compatible distributed object storage service for StartOS, powered by [Gar
 
 ## Network Interfaces
 
-| Interface | Port | Protocol | Purpose                          |
-| --------- | ---- | -------- | -------------------------------- |
-| S3 API    | 3900 | HTTP     | S3-compatible object storage API |
-| Admin API | 3903 | HTTP     | Garage administration API        |
+| Interface      | Port | Protocol | Purpose                                |
+| -------------- | ---- | -------- | -------------------------------------- |
+| S3 API         | 3900 | HTTP     | S3-compatible object storage API       |
+| S3 Web Hosting | 3902 | HTTP     | Serves static websites from S3 buckets |
+| Admin API      | 3903 | HTTP     | Garage administration API              |
 
 ## Actions
 
 | Action                     | Description                                 |
 | -------------------------- | ------------------------------------------- |
 | Reset Admin Token          | Generate a new admin API token              |
+| Cluster Status             | Show the status of the Garage cluster       |
 | Create Bucket              | Create a new S3 bucket                      |
 | Create API Key             | Create a new S3 API key pair                |
 | List Buckets               | List all S3 buckets with authorized keys    |
@@ -54,16 +56,9 @@ The `main` volume is backed up.
 
 ## Health Checks
 
-| Check     | Method                | Messages                        |
-| --------- | --------------------- | ------------------------------- |
-| S3 API    | Port listening (3900) | Ready: "The S3 API is ready"    |
-| Admin API | Port listening (3903) | Ready: "The Admin API is ready" |
-
----
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development workflow.
+| Check  | Method                                   | Messages                                           |
+| ------ | ---------------------------------------- | -------------------------------------------------- |
+| Garage | Web URL check on `localhost:3903/health` | Healthy: "Garage is healthy" / "Garage is not healthy" |
 
 ---
 
@@ -78,10 +73,12 @@ volumes:
   main: /data
 ports:
   s3_api: 3900
+  s3_web: 3902
   admin_api: 3903
 dependencies: none
 actions:
   - reset-admin-token
+  - cluster-status
   - create-bucket
   - create-api-key
   - list-buckets
@@ -90,8 +87,7 @@ actions:
   - delete-api-key
   - grant-bucket-to-key
 health_checks:
-  - port_listening: 3900
-  - port_listening: 3903
+  - web_url: localhost:3903/health
 backup_volumes:
   - main
 ```
