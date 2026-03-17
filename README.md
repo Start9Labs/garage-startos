@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="icon.png" alt="Garage Logo" width="21%">
+  <img src="icon.svg" alt="Garage Logo" width="21%">
 </p>
 
 # Garage on StartOS
@@ -12,36 +12,36 @@ An S3-compatible distributed object storage service for StartOS, powered by [Gar
 
 ## Container Runtime
 
-| Property | Value |
-|----------|-------|
-| Image | `dxflrs/garage:v2.2.0` |
-| Architectures | x86_64, aarch64 |
-| Entrypoint | `/garage server` |
+| Property      | Value                  |
+| ------------- | ---------------------- |
+| Image         | `dxflrs/garage:v2.2.0` |
+| Architectures | x86_64, aarch64        |
+| Entrypoint    | `/garage server`       |
 
 ## Volumes
 
-| Volume | Mount Point | Purpose |
-|--------|-------------|---------|
-| `main` | `/data` | Persistent data and metadata storage |
+| Volume | Mount Point | Purpose                              |
+| ------ | ----------- | ------------------------------------ |
+| `main` | `/data`     | Persistent data and metadata storage |
 
 ## Network Interfaces
 
-| Interface | Port | Protocol | Purpose |
-|-----------|------|----------|---------|
-| S3 API | 3900 | HTTP | S3-compatible object storage API |
-| Admin API | 3903 | HTTP | Garage administration API |
+| Interface | Port | Protocol | Purpose                          |
+| --------- | ---- | -------- | -------------------------------- |
+| S3 API    | 3900 | HTTP     | S3-compatible object storage API |
+| Admin API | 3903 | HTTP     | Garage administration API        |
 
 ## Actions
 
-| Action | Description |
-|--------|-------------|
-| Reset Admin Token | Generate a new admin API token |
-| Create Bucket | Create a new S3 bucket |
-| Create API Key | Create a new S3 API key pair |
-| List Buckets | List all S3 buckets with authorized keys |
-| List API Keys | List all S3 API keys with bucket access |
-| Delete Bucket | Delete an S3 bucket by name |
-| Delete API Key | Delete an S3 API key by its key ID |
+| Action                     | Description                                 |
+| -------------------------- | ------------------------------------------- |
+| Reset Admin Token          | Generate a new admin API token              |
+| Create Bucket              | Create a new S3 bucket                      |
+| Create API Key             | Create a new S3 API key pair                |
+| List Buckets               | List all S3 buckets with authorized keys    |
+| List API Keys              | List all S3 API keys with bucket access     |
+| Delete Bucket              | Delete an S3 bucket by name                 |
+| Delete API Key             | Delete an S3 API key by its key ID          |
 | Grant Bucket Access to Key | Allow a specific API key to access a bucket |
 
 ## Dependencies
@@ -54,9 +54,9 @@ The `main` volume is backed up.
 
 ## Health Checks
 
-| Check | Method | Messages |
-|-------|--------|----------|
-| S3 API | Port listening (3900) | Ready: "The S3 API is ready" |
+| Check     | Method                | Messages                        |
+| --------- | --------------------- | ------------------------------- |
+| S3 API    | Port listening (3900) | Ready: "The S3 API is ready"    |
 | Admin API | Port listening (3903) | Ready: "The Admin API is ready" |
 
 ---
