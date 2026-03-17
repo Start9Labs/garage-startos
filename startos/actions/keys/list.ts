@@ -1,6 +1,6 @@
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { createGarageSub } from './garageSubContainer'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { createGarageSub } from '../utils'
 
 export const listApiKeys = sdk.Action.withoutInput(
   'list-api-keys',
@@ -49,10 +49,9 @@ export const listApiKeys = sdk.Action.withoutInput(
     // Fetch detailed info for each key to get bucket permissions
     const keyDetails = await Promise.all(
       keys.map(async (key) => {
-        const info = await garageSub.exec(
-          ['/garage', 'key', 'info', key.id],
-          { env },
-        )
+        const info = await garageSub.exec(['/garage', 'key', 'info', key.id], {
+          env,
+        })
         const infoOut = String(info.stdout || '')
 
         // Parse bucket permissions from key info output

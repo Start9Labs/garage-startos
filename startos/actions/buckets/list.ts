@@ -1,6 +1,6 @@
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { createGarageSub } from './garageSubContainer'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { createGarageSub } from '../utils'
 
 export const listBuckets = sdk.Action.withoutInput(
   'list-buckets',

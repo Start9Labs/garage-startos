@@ -1,6 +1,6 @@
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { createGarageSub } from './garageSubContainer'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { createGarageSub } from '../utils'
 
 type NodeInfo = {
   id: string

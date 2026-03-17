@@ -1,14 +1,14 @@
 import { sdk } from '../sdk'
 import { getAdminToken } from './getAdminToken'
-import { createBucket } from './createBucket'
-import { createApiKey } from './createApiKey'
-import { listBuckets } from './listBuckets'
-import { listApiKeys } from './listApiKeys'
-import { deleteApiKey } from './deleteApiKey'
-import { deleteBucket } from './deleteBucket'
-import { grantKeyToBucket } from './grantKeyToBucket'
-import { grantBucketToKey } from './grantBucketToKey'
-import { clusterStatus } from './clusterStatus'
+import { createBucket } from './buckets/create'
+import { deleteBucket } from './buckets/delete'
+import { listBuckets } from './buckets/list'
+import { createApiKey } from './keys/create'
+import { deleteApiKey } from './keys/delete'
+import { listApiKeys } from './keys/list'
+import { grantKeyToBucket } from './permissions/grantKeyToBucket'
+import { grantBucketToKey } from './permissions/grantBucketToKey'
+import { clusterStatus } from './cluster/status'
 
 export const actions = sdk.Actions.of()
   .addAction(getAdminToken)

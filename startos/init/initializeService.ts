@@ -1,45 +1,36 @@
-import { writeFile } from 'node:fs/promises'
 import { utils } from '@start9labs/start-sdk'
+import { getAdminToken } from '../actions/getAdminToken'
+import { garageToml } from '../fileModels/garage.toml'
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
-import { getAdminToken } from '../actions/getAdminToken'
-import { s3ApiPort, rpcPort, s3WebPort, adminPort } from '../utils'
-import { generateGarageToml } from '../garageConfig'
+import {
+  garageEnv,
+  garageHealthUrl,
+  garageImageId,
+  garageMounts,
+} from '../utils'
 
 export const initializeService = sdk.setupOnInit(async (effects, kind) => {
   if (kind !== 'install') return
 
-  const rpcSecret = utils.getDefaultString({
-    charset: 'a-f,0-9',
-    len: 64,
-  })
-
-  const adminToken = utils.getDefaultString({
-    charset: 'a-z,A-Z,0-9',
-    len: 32,
-  })
-
-  await storeJson.write(effects, {
-    rpcSecret,
-    adminToken,
+  await garageToml.merge(effects, {
+    rpc_secret: utils.getDefaultString({
+      charset: 'a-f,0-9',
+      len: 64,
+    }),
+    admin: {
+      admin_token: utils.getDefaultString({
+        charset: 'a-z,A-Z,0-9',
+        len: 32,
+      }),
+    },
   })
 
   const garageSub = await sdk.SubContainer.of(
     effects,
-    { imageId: 'garage' },
-    sdk.Mounts.of().mountVolume({
-      volumeId: 'main',
-      subpath: null,
-      mountpoint: '/data',
-      readonly: false,
-    }),
+    garageImageId,
+    garageMounts,
     'garage-init-sub',
-  )
-
-  await writeFile(
-    `${garageSub.rootfs}/etc/garage.toml`,
-    generateGarageToml({ rpcSecret, adminToken }),
   )
 
   await sdk.Daemons.of(effects)
@@ -47,31 +38,60 @@ export const initializeService = sdk.setupOnInit(async (effects, kind) => {
       subcontainer: garageSub,
       exec: {
         command: ['/garage', 'server'],
-        env: { GARAGE_CONFIG_FILE: '/etc/garage.toml' },
+        env: garageEnv,
       },
       ready: {
-        display: null,
+        display: i18n('Garage'),
         fn: () =>
-          sdk.healthCheck.checkPortListening(effects, s3ApiPort, {
-            successMessage: 'Garage is ready',
-            errorMessage: 'Garage is not ready',
+          sdk.healthCheck.checkWebUrl(effects, garageHealthUrl, {
+            successMessage: i18n('Garage is healthy'),
+            errorMessage: i18n('Garage is not healthy'),
           }),
       },
       requires: [],
     })
-    .addOneshot('configure-layout', {
+    .addOneshot('bootstrap-layout', {
       subcontainer: garageSub,
       exec: {
-        command: [
-          '/bin/sh',
-          '-c',
-          `export GARAGE_CONFIG_FILE=/etc/garage.toml
-NODE_ID=$(/garage node id 2>&1 | cut -d@ -f1 | head -n1)
-/garage layout assign -z dc1 -c 1G "$NODE_ID"
-LAYOUT_VER=$(/garage layout show 2>&1 | grep 'apply --version' | awk '{print $NF}')
-/garage layout apply --version "$LAYOUT_VER"`,
-        ],
-        env: { GARAGE_CONFIG_FILE: '/etc/garage.toml' },
+        fn: async () => {
+          // Get node ID
+          const idRes = await garageSub.execFail(
+            ['/garage', 'node', 'id'],
+            { env: garageEnv },
+          )
+          const nodeId = String(idRes.stdout)
+            .split('@')[0]
+            .split('\n')[0]
+            .trim()
+
+          // Assign layout
+          await garageSub.execFail(
+            ['/garage', 'layout', 'assign', '-z', 'dc1', '-c', '1G', nodeId],
+            { env: garageEnv },
+          )
+
+          // Get layout version
+          const showRes = await garageSub.execFail(
+            ['/garage', 'layout', 'show'],
+            { env: garageEnv },
+          )
+          const versionMatch = String(showRes.stdout).match(
+            /apply --version (\d+)/,
+          )
+          if (!versionMatch) {
+            throw new Error(
+              `Could not parse layout version from: ${showRes.stdout}`,
+            )
+          }
+
+          // Apply layout
+          await garageSub.execFail(
+            ['/garage', 'layout', 'apply', '--version', versionMatch[1]],
+            { env: garageEnv },
+          )
+
+          return null
+        },
       },
       requires: ['garage'],
     })

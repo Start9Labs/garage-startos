@@ -1,6 +1,6 @@
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
+import { garageToml } from '../fileModels/garage.toml'
 
 export const getAdminToken = sdk.Action.withoutInput(
   'get-admin-token',
@@ -15,7 +15,7 @@ export const getAdminToken = sdk.Action.withoutInput(
   }),
 
   async ({ effects }) => {
-    const store = await storeJson.read().once()
+    const config = await garageToml.read().once()
 
     return {
       version: '1' as const,
@@ -26,7 +26,7 @@ export const getAdminToken = sdk.Action.withoutInput(
         type: 'single',
         name: 'Admin Token',
         description: null,
-        value: store?.adminToken ?? 'UNKNOWN',
+        value: config?.admin?.admin_token ?? 'UNKNOWN',
         masked: true,
         copyable: true,
         qr: false,

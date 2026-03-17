@@ -1,6 +1,6 @@
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { createGarageSub, parseKeyList } from './garageSubContainer'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { createGarageSub, parseKeyList } from '../utils'
 
 const { InputSpec, Value } = sdk
 

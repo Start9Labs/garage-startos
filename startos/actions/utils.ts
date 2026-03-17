@@ -1,38 +1,21 @@
 import { sdk } from '../sdk'
-import { storeJson } from '../fileModels/store.json'
-import { generateGarageToml } from '../garageConfig'
+import { garageEnv, garageImageId, garageMounts } from '../utils'
 
 type Effects = Parameters<typeof sdk.SubContainer.of>[0]
 
 /**
  * Create a garage SubContainer ready for CLI commands.
- * Reads rpcSecret/adminToken from store, mounts the main volume,
- * and writes garage.toml into the container.
+ * The garage.toml lives on the volume at /data/garage.toml.
  */
 export async function createGarageSub(effects: Effects) {
-  const store = await storeJson.read().once()
-  const rpcSecret = store?.rpcSecret ?? ''
-  const adminToken = store?.adminToken ?? ''
-  const env = { GARAGE_CONFIG_FILE: '/etc/garage.toml' }
-
   const sub = await sdk.SubContainer.of(
     effects,
-    { imageId: 'garage' },
-    sdk.Mounts.of().mountVolume({
-      volumeId: 'main',
-      subpath: null,
-      mountpoint: '/data',
-      readonly: false,
-    }),
+    garageImageId,
+    garageMounts,
     'garage-action-sub',
   )
 
-  await sub.writeFile(
-    '/etc/garage.toml',
-    generateGarageToml({ rpcSecret, adminToken }),
-  )
-
-  return { sub, env }
+  return { sub, env: garageEnv }
 }
 
 /** Parse `garage key list` output into key IDs and names. */

@@ -1,10 +1,6 @@
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import {
-  createGarageSub,
-  parseBucketList,
-  parseKeyList,
-} from './garageSubContainer'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { createGarageSub, parseBucketList, parseKeyList } from '../utils'
 
 const { InputSpec, Value } = sdk
 
@@ -109,9 +105,7 @@ export const grantBucketToKey = sdk.Action.withInput(
 
   async ({ effects, input }) => {
     if (input.bucketName === '_none') {
-      throw new Error(
-        'Please create buckets before granting access.',
-      )
+      throw new Error('Please create buckets before granting access.')
     }
 
     if (input.keyIds.length === 0) {

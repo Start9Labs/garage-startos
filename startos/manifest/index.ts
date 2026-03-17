@@ -1,5 +1,5 @@
 import { setupManifest } from '@start9labs/start-sdk'
-import { short, long, alertInstall, alertRestore } from './i18n'
+import { alertRestore, long, short } from './i18n'
 
 export const manifest = setupManifest({
   id: 'garage',
@@ -9,19 +9,19 @@ export const manifest = setupManifest({
   upstreamRepo: 'https://git.deuxfleurs.fr/Deuxfleurs/garage',
   marketingUrl: 'https://garagehq.deuxfleurs.fr/',
   donationUrl: null,
-  docsUrls: ['https://github.com/JesseMarkowitz/garage-startos/blob/main/instructions.md'],
+  docsUrls: ['https://garagehq.deuxfleurs.fr/documentation/quick-start/#up'],
   description: { short, long },
   volumes: ['main'],
   images: {
     garage: {
       source: {
-        dockerBuild: {},
+        dockerTag: 'dxflrs/garage:v2.2.0',
       },
       arch: ['x86_64', 'aarch64'],
     },
   },
   alerts: {
-    install: alertInstall,
+    install: null,
     update: null,
     uninstall: null,
     restore: alertRestore,

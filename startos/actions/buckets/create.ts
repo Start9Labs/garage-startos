@@ -1,6 +1,6 @@
-import { i18n } from '../i18n'
-import { sdk } from '../sdk'
-import { createGarageSub } from './garageSubContainer'
+import { i18n } from '../../i18n'
+import { sdk } from '../../sdk'
+import { createGarageSub } from '../utils'
 
 const { InputSpec, Value } = sdk
 
@@ -45,10 +45,9 @@ export const createBucket = sdk.Action.withInput(
   async ({ effects, input }) => {
     const { sub, env } = await createGarageSub(effects)
 
-    await sub.execFail(
-      ['/garage', 'bucket', 'create', input.bucketName],
-      { env },
-    )
+    await sub.execFail(['/garage', 'bucket', 'create', input.bucketName], {
+      env,
+    })
 
     // Fetch bucket info for accurate details
     const info = await sub.exec(
