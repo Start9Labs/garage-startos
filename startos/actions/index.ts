@@ -1,17 +1,16 @@
 import { sdk } from '../sdk'
-import { getAdminToken } from './getAdminToken'
 import { createBucket } from './buckets/create'
 import { deleteBucket } from './buckets/delete'
 import { listBuckets } from './buckets/list'
+import { resetAdminToken } from './resetAdminToken'
 import { createApiKey } from './keys/create'
 import { deleteApiKey } from './keys/delete'
+import { grantBucketToKey } from './keys/grantBucketToKey'
 import { listApiKeys } from './keys/list'
-import { grantKeyToBucket } from './permissions/grantKeyToBucket'
-import { grantBucketToKey } from './permissions/grantBucketToKey'
-import { clusterStatus } from './cluster/status'
+import { clusterStatus } from './status'
 
 export const actions = sdk.Actions.of()
-  .addAction(getAdminToken)
+  .addAction(resetAdminToken)
   .addAction(clusterStatus)
   .addAction(createBucket)
   .addAction(createApiKey)
@@ -19,5 +18,4 @@ export const actions = sdk.Actions.of()
   .addAction(listApiKeys)
   .addAction(deleteApiKey)
   .addAction(deleteBucket)
-  .addAction(grantKeyToBucket)
   .addAction(grantBucketToKey)

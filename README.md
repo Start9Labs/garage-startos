@@ -35,14 +35,13 @@ An S3-compatible distributed object storage service for StartOS, powered by [Gar
 
 | Action | Description |
 |--------|-------------|
-| Get Admin Token | Retrieve the admin API token |
+| Reset Admin Token | Generate a new admin API token |
 | Create Bucket | Create a new S3 bucket |
 | Create API Key | Create a new S3 API key pair |
 | List Buckets | List all S3 buckets with authorized keys |
 | List API Keys | List all S3 API keys with bucket access |
 | Delete Bucket | Delete an S3 bucket by name |
 | Delete API Key | Delete an S3 API key by its key ID |
-| Grant Key Access to Bucket | Grant an API key read/write access to a bucket |
 | Grant Bucket Access to Key | Allow a specific API key to access a bucket |
 
 ## Dependencies
@@ -82,14 +81,13 @@ ports:
   admin_api: 3903
 dependencies: none
 actions:
-  - get-admin-token
+  - reset-admin-token
   - create-bucket
   - create-api-key
   - list-buckets
   - list-api-keys
   - delete-bucket
   - delete-api-key
-  - grant-key-to-bucket
   - grant-bucket-to-key
 health_checks:
   - port_listening: 3900

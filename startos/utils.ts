@@ -10,9 +10,24 @@ export const garageHealthUrl = `http://127.0.0.1:${adminPort}/health`
 
 export const garageImageId = { imageId: 'garage' } as const
 
-export const garageMounts = sdk.Mounts.of().mountVolume({
-  volumeId: 'main',
-  subpath: null,
-  mountpoint: '/data',
-  readonly: false,
-})
+export const garageMounts = sdk.Mounts.of()
+  .mountVolume({
+    volumeId: 'main',
+    subpath: null,
+    mountpoint: '/data',
+    readonly: false,
+  })
+  .mountVolume({
+    volumeId: 'main',
+    subpath: 'passwd',
+    mountpoint: '/etc/passwd',
+    readonly: true,
+    type: 'file',
+  })
+  .mountVolume({
+    volumeId: 'main',
+    subpath: 'group',
+    mountpoint: '/etc/group',
+    readonly: true,
+    type: 'file',
+  })

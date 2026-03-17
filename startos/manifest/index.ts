@@ -1,11 +1,11 @@
 import { setupManifest } from '@start9labs/start-sdk'
-import { alertRestore, long, short } from './i18n'
+import { alertRestore, alertUninstall, long, short } from './i18n'
 
 export const manifest = setupManifest({
   id: 'garage',
   title: 'Garage',
   license: 'AGPL-3.0',
-  packageRepo: 'https://github.com/jessemarkowitz/garage-startos',
+  packageRepo: 'https://github.com/Start9Labs/garage-startos/tree/update/040',
   upstreamRepo: 'https://git.deuxfleurs.fr/Deuxfleurs/garage',
   marketingUrl: 'https://garagehq.deuxfleurs.fr/',
   donationUrl: null,
@@ -23,7 +23,7 @@ export const manifest = setupManifest({
   alerts: {
     install: null,
     update: null,
-    uninstall: null,
+    uninstall: alertUninstall,
     restore: alertRestore,
     start: null,
     stop: null,

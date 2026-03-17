@@ -95,7 +95,7 @@ export const grantBucketToKey = sdk.Action.withInput(
     description: i18n('Allow a specific API key to access a bucket'),
     warning: null,
     allowedStatuses: 'only-running',
-    group: 'Permissions',
+    group: 'Keys',
     visibility: 'enabled',
   }),
 

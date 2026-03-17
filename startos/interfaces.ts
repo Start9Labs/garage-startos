@@ -9,10 +9,10 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
     protocol: 'http',
   })
   const webInterface = sdk.createInterface(effects, {
-    name: i18n('S3 Web Interface'),
+    name: i18n('S3 Web Hosting'),
     id: 'web',
-    description: i18n('Static website hosting endpoint for S3 buckets'),
-    type: 'ui',
+    description: i18n('Serves static websites from S3 buckets'),
+    type: 'api',
     masked: false,
     schemeOverride: null,
     username: null,

@@ -1,8 +1,8 @@
 import { utils } from '@start9labs/start-sdk'
-import { getAdminToken } from '../actions/getAdminToken'
 import { garageToml } from '../fileModels/garage.toml'
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
+import { groupFile, passwdFile } from '../fileModels/etc'
 import {
   garageEnv,
   garageHealthUrl,
@@ -13,17 +13,14 @@ import {
 export const initializeService = sdk.setupOnInit(async (effects, kind) => {
   if (kind !== 'install') return
 
+  await passwdFile.write(effects, 'root:x:0:0:root:/root:/bin/sh\n')
+  await groupFile.write(effects, 'root:x:0:\n')
+
   await garageToml.merge(effects, {
     rpc_secret: utils.getDefaultString({
       charset: 'a-f,0-9',
       len: 64,
     }),
-    admin: {
-      admin_token: utils.getDefaultString({
-        charset: 'a-z,A-Z,0-9',
-        len: 32,
-      }),
-    },
   })
 
   const garageSub = await sdk.SubContainer.of(
@@ -96,8 +93,4 @@ export const initializeService = sdk.setupOnInit(async (effects, kind) => {
       requires: ['garage'],
     })
     .runUntilSuccess(120_000)
-
-  await sdk.action.createOwnTask(effects, getAdminToken, 'critical', {
-    reason: i18n('Retrieve the admin API token'),
-  })
 })

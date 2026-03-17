@@ -5,7 +5,7 @@
 #   1. Install Garage on StartOS and ensure it is running (healthy)
 #   2. Use the "Create Bucket" action to create a test bucket
 #   3. Use the "Create API Key" action to create a key (save the secret!)
-#   4. Use "Grant Key Access to Bucket" to give the key Read+Write+Owner on the bucket
+#   4. Use "Grant Bucket Access to Keys" to give the key Read+Write+Owner on the bucket
 #   5. Find the S3 endpoint URL from the StartOS Interfaces tab (S3 API Interface)
 #
 # Usage:

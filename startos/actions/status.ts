@@ -1,6 +1,6 @@
-import { i18n } from '../../i18n'
-import { sdk } from '../../sdk'
-import { createGarageSub } from '../utils'
+import { i18n } from '../i18n'
+import { sdk } from '../sdk'
+import { createGarageSub } from './utils'
 
 type NodeInfo = {
   id: string
@@ -59,7 +59,7 @@ export const clusterStatus = sdk.Action.withoutInput(
     description: i18n('Show the status of the Garage cluster'),
     warning: null,
     allowedStatuses: 'only-running',
-    group: 'Cluster',
+    group: null,
     visibility: 'enabled',
   }),
 

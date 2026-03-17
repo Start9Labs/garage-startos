@@ -21,7 +21,7 @@ const adminSchema = z.object({
   api_bind_addr: z
     .literal(`0.0.0.0:${adminPort}`)
     .catch(`0.0.0.0:${adminPort}`),
-  admin_token: z.string().catch(''),
+  admin_token: z.string().optional().catch(undefined),
 })
 
 export const shape = z.object({

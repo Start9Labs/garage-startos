@@ -6,4 +6,3 @@ node_modules/
 docker-images
 javascript
 ncc-cache*.s9pk
-test3.sh
