@@ -9,7 +9,9 @@ export const manifest = setupManifest({
   upstreamRepo: 'https://git.deuxfleurs.fr/Deuxfleurs/garage',
   marketingUrl: 'https://garagehq.deuxfleurs.fr/',
   donationUrl: null,
-  docsUrls: ['https://garagehq.deuxfleurs.fr/documentation/quick-start/#up'],
+  docsUrls: [
+    'https://git.deuxfleurs.fr/Deuxfleurs/garage/src/branch/main-v2/doc/book',
+  ],
   description: { short, long },
   volumes: ['main'],
   images: {
