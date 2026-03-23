@@ -14,7 +14,7 @@ An S3-compatible distributed object storage service for StartOS, powered by [Gar
 
 | Property      | Value                  |
 | ------------- | ---------------------- |
-| Image         | `dxflrs/garage:v2.2.0` |
+| Image         | `dxflrs/garage` |
 | Architectures | x86_64, aarch64        |
 | Entrypoint    | `/garage server`       |
 
@@ -66,8 +66,7 @@ The `main` volume is backed up.
 
 ```yaml
 package_id: garage
-upstream_version: 2.2.0
-image: dxflrs/garage:v2.2.0
+image: dxflrs/garage
 architectures: [x86_64, aarch64]
 volumes:
   main: /data
