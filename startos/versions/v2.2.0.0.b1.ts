@@ -1,7 +1,7 @@
 import { VersionInfo } from '@start9labs/start-sdk'
 
-export const v_2_2_0_0_b0 = VersionInfo.of({
-  version: '2.2.0:0-beta.0',
+export const v_2_2_0_0_b1 = VersionInfo.of({
+  version: '2.2.0:0-beta.1',
   releaseNotes: {
     en_US: 'Downgrade Garage to upstream version 2.2.0',
     es_ES: 'Downgrade de Garage a la versión upstream 2.2.0',
