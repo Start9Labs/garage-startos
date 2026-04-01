@@ -5,7 +5,7 @@ export const manifest = setupManifest({
   id: 'garage',
   title: 'Garage',
   license: 'AGPL-3.0',
-  packageRepo: 'https://github.com/Start9Labs/garage-startos/tree/update/040',
+  packageRepo: 'https://github.com/Start9Labs/garage-startos',
   upstreamRepo: 'https://git.deuxfleurs.fr/Deuxfleurs/garage',
   marketingUrl: 'https://garagehq.deuxfleurs.fr/',
   donationUrl: null,
