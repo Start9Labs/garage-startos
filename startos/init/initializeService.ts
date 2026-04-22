@@ -91,7 +91,7 @@ export const initializeService = sdk.setupOnInit(async (effects, kind) => {
         },
         requires: ['garage'],
       })
-      .runUntilSuccess(120_000)
+      .runUntilSuccess(300_000)
   } else {
     await garageToml.merge(effects, {})
   }

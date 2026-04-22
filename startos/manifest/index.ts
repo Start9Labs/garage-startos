@@ -17,7 +17,7 @@ export const manifest = setupManifest({
   images: {
     garage: {
       source: {
-        dockerTag: 'dxflrs/garage:v2.2.0',
+        dockerTag: 'dxflrs/garage:v2.3.0',
       },
       arch: ['x86_64', 'aarch64'],
     },
