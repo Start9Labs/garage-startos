@@ -1,4 +1,3 @@
-## How the upstream version is pulled
-- dockerTag in `startos/manifest/index.ts`: `dxflrs/garage:v<version>`
+# CLAUDE.md
 
-> Upstream repo is on git.deuxfleurs.fr, not GitHub. Check releases at https://git.deuxfleurs.fr/Deuxfleurs/garage/releases
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the doc map and contribution workflow.
