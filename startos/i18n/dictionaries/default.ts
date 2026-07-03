@@ -43,6 +43,7 @@ const dict = {
 
   // init tasks
   'Set your admin API token': 34,
+  'Bootstrapping the Garage cluster': 35,
 } as const
 
 /**

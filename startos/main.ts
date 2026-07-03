@@ -8,7 +8,7 @@ import {
 } from './utils'
 
 export const main = sdk.setupMain(async ({ effects }) => {
-  const garageSub = await sdk.SubContainer.of(
+  const garageSub = sdk.SubContainer.of(
     effects,
     garageImageId,
     garageMounts,
