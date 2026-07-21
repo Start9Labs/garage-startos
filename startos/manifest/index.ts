@@ -1,5 +1,5 @@
 import { setupManifest } from '@start9labs/start-sdk'
-import { alertRestore, alertUninstall, long, short } from './i18n'
+import { long, short } from './i18n'
 
 export const manifest = setupManifest({
   id: 'garage',
@@ -18,14 +18,6 @@ export const manifest = setupManifest({
       },
       arch: ['x86_64', 'aarch64'],
     },
-  },
-  alerts: {
-    install: null,
-    update: null,
-    uninstall: alertUninstall,
-    restore: alertRestore,
-    start: null,
-    stop: null,
   },
   dependencies: {},
 })

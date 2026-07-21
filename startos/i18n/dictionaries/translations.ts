@@ -37,6 +37,7 @@ export default {
     32: 'Estado del clúster',
     33: 'Mostrar el estado del clúster de Garage',
     34: 'Establezca su token de API de administrador',
+    35: 'Inicializando el clúster de Garage',
   },
   de_DE: {
     0: 'S3-API',
@@ -74,6 +75,7 @@ export default {
     32: 'Cluster-Status',
     33: 'Den Status des Garage-Clusters anzeigen',
     34: 'Legen Sie Ihr Admin-API-Token fest',
+    35: 'Garage-Cluster wird initialisiert',
   },
   pl_PL: {
     0: 'API S3',
@@ -111,6 +113,7 @@ export default {
     32: 'Status klastra',
     33: 'Wyświetl status klastra Garage',
     34: 'Ustaw swój token API administracyjnego',
+    35: 'Inicjowanie klastra Garage',
   },
   fr_FR: {
     0: 'API S3',
@@ -148,5 +151,6 @@ export default {
     32: 'État du cluster',
     33: "Afficher l'état du cluster Garage",
     34: "Définissez votre jeton d'API d'administration",
+    35: 'Initialisation du cluster Garage',
   },
 } satisfies Record<string, LangDict>

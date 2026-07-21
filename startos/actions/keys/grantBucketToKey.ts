@@ -141,7 +141,9 @@ export const grantBucketToKey = sdk.Action.withInput(
 
       const allowResult = await sub.exec(allowArgs, { env })
       if (allowResult.exitCode !== 0) {
-        errors.push(`${keyId}: ${allowResult.stderr || allowResult.stdout}`)
+        errors.push(
+          `${keyId}: ${String(allowResult.stderr || allowResult.stdout)}`,
+        )
         continue
       }
 
@@ -156,7 +158,7 @@ export const grantBucketToKey = sdk.Action.withInput(
         const denyResult = await sub.exec(denyArgs, { env })
         if (denyResult.exitCode !== 0) {
           errors.push(
-            `${keyId} (deny): ${denyResult.stderr || denyResult.stdout}`,
+            `${keyId} (deny): ${String(denyResult.stderr || denyResult.stdout)}`,
           )
           continue
         }

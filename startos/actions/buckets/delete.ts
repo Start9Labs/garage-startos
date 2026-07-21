@@ -74,7 +74,7 @@ export const deleteBucket = sdk.Action.withInput(
         { env },
       )
       if (result.exitCode !== 0) {
-        errors.push(`${name}: ${result.stderr || result.stdout}`)
+        errors.push(`${name}: ${String(result.stderr || result.stdout)}`)
       } else {
         deleted.push(name)
       }

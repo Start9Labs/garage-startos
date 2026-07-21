@@ -8,7 +8,7 @@ type Effects = Parameters<typeof sdk.SubContainer.of>[0]
  * The garage.toml lives on the volume at /data/garage.toml.
  */
 export async function createGarageSub(effects: Effects) {
-  const sub = await sdk.SubContainer.of(
+  const sub = sdk.SubContainer.of(
     effects,
     garageImageId,
     garageMounts,

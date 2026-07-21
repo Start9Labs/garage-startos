@@ -39,6 +39,11 @@ Buckets configured for website hosting are served on the **S3 Web Hosting** inte
 - **Create API Key**, **List API Keys**, **Delete API Key** — manage S3 access key / secret key pairs. The secret is shown once at creation; save it then.
 - **Grant Bucket Access to Keys** — authorise one or more API keys against a bucket. Pick the bucket, pick the keys, and toggle read / write / owner.
 
+## Backups, restore, and uninstall
+
+- **After restoring from a backup**, the S3 API and Admin API ports may have changed. Check the **Interfaces** tab for the current URLs and update any clients or applications that connect to Garage.
+- **Uninstalling Garage permanently deletes all S3 buckets, objects, and API keys.** Make sure you have backed up anything you want to keep first.
+
 ## Limitations
 
 Garage runs on StartOS as a **single-node cluster**: replication factor is fixed at 1, and multi-node clusters are not supported. The S3 region is fixed at `garage` and the bind addresses, database engine (LMDB), and consistency mode are not configurable.

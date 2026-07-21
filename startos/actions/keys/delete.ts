@@ -72,7 +72,7 @@ export const deleteApiKey = sdk.Action.withInput(
         { env },
       )
       if (result.exitCode !== 0) {
-        errors.push(`${keyId}: ${result.stderr || result.stdout}`)
+        errors.push(`${keyId}: ${String(result.stderr || result.stdout)}`)
       } else {
         deleted.push(keyId)
       }
