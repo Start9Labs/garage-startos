@@ -34,20 +34,20 @@
 
 ## Image and Container Runtime
 
-| Property      | Value                            |
-| ------------- | -------------------------------- |
-| Image         | `dxflrs/garage` (upstream)       |
-| Architectures | x86_64, aarch64                  |
-| Command       | `/garage server`                 |
+| Property      | Value                                  |
+| ------------- | -------------------------------------- |
+| Image         | `dxflrs/garage` (upstream)             |
+| Architectures | x86_64, aarch64                        |
+| Command       | `/garage server`                       |
 | Config env    | `GARAGE_CONFIG_FILE=/data/garage.toml` |
 
 ---
 
 ## Volume and Data Layout
 
-| Volume | Mount Point | Purpose                              |
-| ------ | ----------- | ------------------------------------ |
-| `main` | `/data`     | Metadata, block storage, and config  |
+| Volume | Mount Point | Purpose                             |
+| ------ | ----------- | ----------------------------------- |
+| `main` | `/data`     | Metadata, block storage, and config |
 
 **Key paths on the `main` volume:**
 
@@ -74,19 +74,19 @@ After install, run the "Set Admin Token" action to get your admin API token.
 
 ## Configuration Management
 
-| StartOS-Managed (fixed)              | Upstream Default                  |
-| ------------------------------------ | --------------------------------- |
-| `metadata_dir` = `/data/metadata`    | Configurable                      |
-| `data_dir` = `/data/blocks`          | Configurable                      |
-| `db_engine` = `lmdb`                 | Configurable                      |
-| `replication_factor` = `1`           | Configurable                      |
-| `consistency_mode` = `consistent`    | Configurable                      |
-| `rpc_bind_addr` = `0.0.0.0:3901`    | Configurable                      |
-| `s3_api.api_bind_addr` = `0.0.0.0:3900` | Configurable                  |
-| `s3_api.s3_region` = `garage`        | Configurable                      |
-| `s3_web.bind_addr` = `0.0.0.0:3902` | Configurable                      |
-| `admin.api_bind_addr` = `0.0.0.0:3903` | Configurable                   |
-| Admin token                          | Via "Reset Admin Token" action    |
+| StartOS-Managed (fixed)                 | Upstream Default               |
+| --------------------------------------- | ------------------------------ |
+| `metadata_dir` = `/data/metadata`       | Configurable                   |
+| `data_dir` = `/data/blocks`             | Configurable                   |
+| `db_engine` = `lmdb`                    | Configurable                   |
+| `replication_factor` = `1`              | Configurable                   |
+| `consistency_mode` = `consistent`       | Configurable                   |
+| `rpc_bind_addr` = `0.0.0.0:3901`        | Configurable                   |
+| `s3_api.api_bind_addr` = `0.0.0.0:3900` | Configurable                   |
+| `s3_api.s3_region` = `garage`           | Configurable                   |
+| `s3_web.bind_addr` = `0.0.0.0:3902`     | Configurable                   |
+| `admin.api_bind_addr` = `0.0.0.0:3903`  | Configurable                   |
+| Admin token                             | Via "Reset Admin Token" action |
 
 **Not configurable on StartOS:** replication factor, consistency mode, database engine, bind addresses, S3 region.
 
@@ -113,34 +113,34 @@ After install, run the "Set Admin Token" action to get your admin API token.
 
 ### Reset Admin Token
 
-| Property     | Value |
-|--------------|-------|
-| ID           | `reset-admin-token` |
-| Visibility   | Enabled |
-| Availability | Any status |
-| Group        | — |
+| Property     | Value                          |
+| ------------ | ------------------------------ |
+| ID           | `reset-admin-token`            |
+| Visibility   | Enabled                        |
+| Availability | Any status                     |
+| Group        | —                              |
 | Purpose      | Generate a new admin API token |
 
 **Output:** Displays the new admin token (masked, copyable). Name changes to "Set Admin Token" if no token exists yet.
 
 ### Cluster Status
 
-| Property     | Value |
-|--------------|-------|
-| ID           | `cluster-status` |
-| Visibility   | Enabled |
-| Availability | Only when running |
-| Group        | — |
+| Property     | Value                                                       |
+| ------------ | ----------------------------------------------------------- |
+| ID           | `cluster-status`                                            |
+| Visibility   | Enabled                                                     |
+| Availability | Only when running                                           |
+| Group        | —                                                           |
 | Purpose      | Show healthy/unhealthy nodes with IDs, addresses, and roles |
 
 ### Create Bucket
 
-| Property     | Value |
-|--------------|-------|
-| ID           | `create-bucket` |
-| Visibility   | Enabled |
-| Availability | Only when running |
-| Group        | Buckets |
+| Property     | Value                  |
+| ------------ | ---------------------- |
+| ID           | `create-bucket`        |
+| Visibility   | Enabled                |
+| Availability | Only when running      |
+| Group        | Buckets                |
 | Purpose      | Create a new S3 bucket |
 
 **Inputs:** Bucket name (lowercase, hyphens, 1–63 chars).
@@ -148,34 +148,34 @@ After install, run the "Set Admin Token" action to get your admin API token.
 
 ### Delete Bucket
 
-| Property     | Value |
-|--------------|-------|
-| ID           | `delete-bucket` |
-| Visibility   | Enabled |
-| Availability | Only when running |
-| Group        | Buckets |
+| Property     | Value                         |
+| ------------ | ----------------------------- |
+| ID           | `delete-bucket`               |
+| Visibility   | Enabled                       |
+| Availability | Only when running             |
+| Group        | Buckets                       |
 | Purpose      | Delete one or more S3 buckets |
 
 **Inputs:** Multi-select from existing buckets.
 
 ### List Buckets
 
-| Property     | Value |
-|--------------|-------|
-| ID           | `list-buckets` |
-| Visibility   | Enabled |
-| Availability | Only when running |
-| Group        | Buckets |
+| Property     | Value                                 |
+| ------------ | ------------------------------------- |
+| ID           | `list-buckets`                        |
+| Visibility   | Enabled                               |
+| Availability | Only when running                     |
+| Group        | Buckets                               |
 | Purpose      | List all buckets with authorized keys |
 
 ### Create API Key
 
-| Property     | Value |
-|--------------|-------|
-| ID           | `create-api-key` |
-| Visibility   | Enabled |
-| Availability | Only when running |
-| Group        | API Keys |
+| Property     | Value                        |
+| ------------ | ---------------------------- |
+| ID           | `create-api-key`             |
+| Visibility   | Enabled                      |
+| Availability | Only when running            |
+| Group        | API Keys                     |
 | Purpose      | Create a new S3 API key pair |
 
 **Inputs:** Key name (1–128 chars).
@@ -183,34 +183,34 @@ After install, run the "Set Admin Token" action to get your admin API token.
 
 ### Delete API Key
 
-| Property     | Value |
-|--------------|-------|
-| ID           | `delete-api-key` |
-| Visibility   | Enabled |
-| Availability | Only when running |
-| Group        | API Keys |
+| Property     | Value                       |
+| ------------ | --------------------------- |
+| ID           | `delete-api-key`            |
+| Visibility   | Enabled                     |
+| Availability | Only when running           |
+| Group        | API Keys                    |
 | Purpose      | Delete one or more API keys |
 
 **Inputs:** Multi-select from existing keys.
 
 ### List API Keys
 
-| Property     | Value |
-|--------------|-------|
-| ID           | `list-api-keys` |
-| Visibility   | Enabled |
-| Availability | Only when running |
-| Group        | API Keys |
+| Property     | Value                                                |
+| ------------ | ---------------------------------------------------- |
+| ID           | `list-api-keys`                                      |
+| Visibility   | Enabled                                              |
+| Availability | Only when running                                    |
+| Group        | API Keys                                             |
 | Purpose      | List all API keys with bucket access and permissions |
 
 ### Grant Bucket Access to Key
 
-| Property     | Value |
-|--------------|-------|
-| ID           | `grant-bucket-to-key` |
-| Visibility   | Enabled |
-| Availability | Only when running |
-| Group        | Keys |
+| Property     | Value                               |
+| ------------ | ----------------------------------- |
+| ID           | `grant-bucket-to-key`               |
+| Visibility   | Enabled                             |
+| Availability | Only when running                   |
+| Group        | Keys                                |
 | Purpose      | Grant an API key access to a bucket |
 
 **Inputs:** Bucket (select), API keys (multi-select), read (default: on), write (default: on), owner (default: off).
@@ -232,8 +232,8 @@ After install, run the "Set Admin Token" action to get your admin API token.
 
 ## Health Checks
 
-| Check  | Method                                 | Messages                                   |
-| ------ | -------------------------------------- | ------------------------------------------ |
+| Check  | Method                                  | Messages                                                      |
+| ------ | --------------------------------------- | ------------------------------------------------------------- |
 | Garage | HTTP GET `http://127.0.0.1:3903/health` | Success: "Garage is healthy" / Error: "Garage is not healthy" |
 
 ---
@@ -267,7 +267,7 @@ None. Garage is a standalone application.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for build instructions and development workflow.
+Build and development workflow follow the StartOS packaging guide: <https://docs.start9.com/packaging>. Keep `README.md`, `instructions.md`, and `AGENTS.md` in sync with any change to user-visible behavior or package structure.
 
 ---
 
