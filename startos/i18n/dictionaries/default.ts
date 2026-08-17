@@ -2,7 +2,7 @@ export const DEFAULT_LANG = 'en_US'
 
 const dict = {
   // main.ts
-  'Garage': 0,
+  Garage: 0,
   'Garage is healthy': 1,
   'Garage is not healthy': 2,
 

@@ -11,9 +11,7 @@ const s3ApiSchema = z.object({
 })
 
 const s3WebSchema = z.object({
-  bind_addr: z
-    .literal(`0.0.0.0:${s3WebPort}`)
-    .catch(`0.0.0.0:${s3WebPort}`),
+  bind_addr: z.literal(`0.0.0.0:${s3WebPort}`).catch(`0.0.0.0:${s3WebPort}`),
   root_domain: z.literal('.web.garage').catch('.web.garage'),
 })
 
@@ -31,9 +29,7 @@ export const shape = z.object({
   db_engine: z.literal('lmdb').catch('lmdb'),
   replication_factor: z.literal(1).catch(1),
   consistency_mode: z.literal('consistent').catch('consistent'),
-  rpc_bind_addr: z
-    .literal(`0.0.0.0:${rpcPort}`)
-    .catch(`0.0.0.0:${rpcPort}`),
+  rpc_bind_addr: z.literal(`0.0.0.0:${rpcPort}`).catch(`0.0.0.0:${rpcPort}`),
   s3_api: s3ApiSchema.catch(() => s3ApiSchema.parse({})),
   s3_web: s3WebSchema.catch(() => s3WebSchema.parse({})),
 
