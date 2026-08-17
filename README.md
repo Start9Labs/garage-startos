@@ -4,13 +4,15 @@
 
 # Garage on StartOS
 
-> **Upstream docs:** <https://garagehq.deuxfleurs.fr/documentation/>
->
 > Everything not listed in this document should behave the same as upstream
 > Garage. If a feature, setting, or behavior is not mentioned here, the
-> upstream documentation is accurate and fully applicable.
+> upstream documentation is accurate and fully applicable — see the
+> Documentation section of `instructions.md` for links.
 
-[Garage](https://git.deuxfleurs.fr/Deuxfleurs/garage) is a lightweight, S3-compatible distributed object storage service. On StartOS it runs as a single-node cluster for self-hosted file storage, backups, and application data.
+[Garage](https://git.deuxfleurs.fr/Deuxfleurs/garage) is an S3-compatible object store designed to run distributed across several machines. This package runs it as a **single node**: install bootstraps the cluster layout for you, and buckets and API keys are managed through StartOS actions rather than a shell.
+
+- **Upstream repo:** <https://git.deuxfleurs.fr/Deuxfleurs/garage>
+- **Wrapper repo:** <https://github.com/Start9Labs/garage-startos>
 
 ---
 
@@ -18,256 +20,172 @@
 
 - [Image and Container Runtime](#image-and-container-runtime)
 - [Volume and Data Layout](#volume-and-data-layout)
-- [Installation and First-Run Flow](#installation-and-first-run-flow)
-- [Configuration Management](#configuration-management)
-- [Network Access and Interfaces](#network-access-and-interfaces)
-- [Actions (StartOS UI)](#actions-startos-ui)
-- [Backups and Restore](#backups-and-restore)
-- [Health Checks](#health-checks)
+- [File Models](#file-models)
 - [Dependencies](#dependencies)
+- [Network Access and Interfaces](#network-access-and-interfaces)
+- [Installation and First-Run Flow](#installation-and-first-run-flow)
+- [Actions](#actions)
+- [Tasks](#tasks)
+- [Health Checks](#health-checks)
+- [Backups and Restore](#backups-and-restore)
 - [Limitations and Differences](#limitations-and-differences)
-- [What Is Unchanged from Upstream](#what-is-unchanged-from-upstream)
-- [Contributing](#contributing)
 - [Quick Reference for AI Consumers](#quick-reference-for-ai-consumers)
 
 ---
 
 ## Image and Container Runtime
 
-| Property      | Value                                  |
-| ------------- | -------------------------------------- |
-| Image         | `dxflrs/garage` (upstream)             |
-| Architectures | x86_64, aarch64                        |
-| Command       | `/garage server`                       |
-| Config env    | `GARAGE_CONFIG_FILE=/data/garage.toml` |
+The upstream image is used unmodified, and one subcontainer runs the service.
 
----
+| Property      | Value                                                          |
+| ------------- | -------------------------------------------------------------- |
+| Image         | `dxflrs/garage`                                                |
+| Architectures | x86_64, aarch64                                                |
+| Command       | `garage server`                                                |
+| Subcontainer  | `garage-sub` — the `garage` daemon, and the one to `attach` to |
+
+Two further subcontainers exist from the same image: `garage-init-sub`, which runs once during install, and `garage-action-sub`, which every action spins up to run Garage's CLI.
 
 ## Volume and Data Layout
 
-| Volume | Mount Point | Purpose                             |
-| ------ | ----------- | ----------------------------------- |
-| `main` | `/data`     | Metadata, block storage, and config |
+One volume, and the layout includes two files that are not Garage's.
 
-**Key paths on the `main` volume:**
+| Volume | Mount Point | Purpose                                                                                    |
+| ------ | ----------- | ------------------------------------------------------------------------------------------ |
+| `main` | `/data`     | `garage.toml`, the LMDB metadata database (`metadata/`), and the object blocks (`blocks/`) |
 
-- `garage.toml` — main configuration file (TOML format, managed by StartOS)
-- `metadata/` — LMDB metadata database
-- `blocks/` — object block storage
-- `passwd` — mounted as `/etc/passwd` (read-only)
-- `group` — mounted as `/etc/group` (read-only)
+The volume additionally supplies `/etc/passwd` and `/etc/group` as **individual read-only file mounts**, written by init. The upstream image is built from scratch and ships neither, which Garage needs in order to resolve the user it runs as.
 
----
+## File Models
 
-## Installation and First-Run Flow
+Three models. One is Garage's configuration; the other two are the account files just described.
 
-On first install, StartOS automatically:
+| File          | Format | Modelled                  | Written by                                            |
+| ------------- | ------ | ------------------------- | ----------------------------------------------------- |
+| `garage.toml` | TOML   | Yes — `FileHelper.toml`   | Install, every init, and the Reset Admin Token action |
+| `passwd`      | text   | Yes — `FileHelper.string` | Every init, unconditionally                           |
+| `group`       | text   | Yes — `FileHelper.string` | Every init, unconditionally                           |
 
-1. Generates a random 64-character hex `rpc_secret`
-2. Starts Garage temporarily to bootstrap the cluster layout (assigns the single node with a 1GB capacity zone)
-3. Applies the layout and shuts down
-4. Creates a critical task prompting the user to set an admin API token
+### garage.toml
 
-After install, run the "Set Admin Token" action to get your admin API token.
+**Enforced** — rewritten to a fixed value whenever the package writes the file: the metadata and data directories, the database engine, both bind addresses for S3 and the admin API, the S3 web bind address, the S3 region and root domains, and the RPC bind address.
 
----
+Two enforced values are worth naming because they encode the single-node decision: **`replication_factor` is pinned to 1 and `consistency_mode` to consistent.** Garage's distributed replication has nothing to replicate to here, and raising the factor on a one-node cluster would leave writes unable to satisfy their quorum.
 
-## Configuration Management
+**Generated at install:** `rpc_secret`, a 64-character hex value. It is what cluster members would authenticate to each other with.
 
-| StartOS-Managed (fixed)                 | Upstream Default               |
-| --------------------------------------- | ------------------------------ |
-| `metadata_dir` = `/data/metadata`       | Configurable                   |
-| `data_dir` = `/data/blocks`             | Configurable                   |
-| `db_engine` = `lmdb`                    | Configurable                   |
-| `replication_factor` = `1`              | Configurable                   |
-| `consistency_mode` = `consistent`       | Configurable                   |
-| `rpc_bind_addr` = `0.0.0.0:3901`        | Configurable                   |
-| `s3_api.api_bind_addr` = `0.0.0.0:3900` | Configurable                   |
-| `s3_api.s3_region` = `garage`           | Configurable                   |
-| `s3_web.bind_addr` = `0.0.0.0:3902`     | Configurable                   |
-| `admin.api_bind_addr` = `0.0.0.0:3903`  | Configurable                   |
-| Admin token                             | Via "Reset Admin Token" action |
+**Yours:** `compression_level`, and `admin_token` through its action.
 
-**Not configurable on StartOS:** replication factor, consistency mode, database engine, bind addresses, S3 region.
+### passwd and group
 
----
-
-## Network Access and Interfaces
-
-| Interface      | Port | Protocol | Purpose                                |
-| -------------- | ---- | -------- | -------------------------------------- |
-| S3 API         | 3900 | HTTP     | S3-compatible object storage API       |
-| S3 Web Hosting | 3902 | HTTP     | Serves static websites from S3 buckets |
-| Admin API      | 3903 | HTTP     | Garage administration API              |
-
-**Access methods:**
-
-- LAN IP with unique port
-- `<hostname>.local` with unique port
-- Tor `.onion` address
-- Custom domains (if configured)
-
----
-
-## Actions (StartOS UI)
-
-### Reset Admin Token
-
-| Property     | Value                          |
-| ------------ | ------------------------------ |
-| ID           | `reset-admin-token`            |
-| Visibility   | Enabled                        |
-| Availability | Any status                     |
-| Group        | —                              |
-| Purpose      | Generate a new admin API token |
-
-**Output:** Displays the new admin token (masked, copyable). Name changes to "Set Admin Token" if no token exists yet.
-
-### Cluster Status
-
-| Property     | Value                                                       |
-| ------------ | ----------------------------------------------------------- |
-| ID           | `cluster-status`                                            |
-| Visibility   | Enabled                                                     |
-| Availability | Only when running                                           |
-| Group        | —                                                           |
-| Purpose      | Show healthy/unhealthy nodes with IDs, addresses, and roles |
-
-### Create Bucket
-
-| Property     | Value                  |
-| ------------ | ---------------------- |
-| ID           | `create-bucket`        |
-| Visibility   | Enabled                |
-| Availability | Only when running      |
-| Group        | Buckets                |
-| Purpose      | Create a new S3 bucket |
-
-**Inputs:** Bucket name (lowercase, hyphens, 1–63 chars).
-**Output:** Bucket name, ID, object count, size.
-
-### Delete Bucket
-
-| Property     | Value                         |
-| ------------ | ----------------------------- |
-| ID           | `delete-bucket`               |
-| Visibility   | Enabled                       |
-| Availability | Only when running             |
-| Group        | Buckets                       |
-| Purpose      | Delete one or more S3 buckets |
-
-**Inputs:** Multi-select from existing buckets.
-
-### List Buckets
-
-| Property     | Value                                 |
-| ------------ | ------------------------------------- |
-| ID           | `list-buckets`                        |
-| Visibility   | Enabled                               |
-| Availability | Only when running                     |
-| Group        | Buckets                               |
-| Purpose      | List all buckets with authorized keys |
-
-### Create API Key
-
-| Property     | Value                        |
-| ------------ | ---------------------------- |
-| ID           | `create-api-key`             |
-| Visibility   | Enabled                      |
-| Availability | Only when running            |
-| Group        | API Keys                     |
-| Purpose      | Create a new S3 API key pair |
-
-**Inputs:** Key name (1–128 chars).
-**Output:** Access key ID and secret access key (masked, copyable).
-
-### Delete API Key
-
-| Property     | Value                       |
-| ------------ | --------------------------- |
-| ID           | `delete-api-key`            |
-| Visibility   | Enabled                     |
-| Availability | Only when running           |
-| Group        | API Keys                    |
-| Purpose      | Delete one or more API keys |
-
-**Inputs:** Multi-select from existing keys.
-
-### List API Keys
-
-| Property     | Value                                                |
-| ------------ | ---------------------------------------------------- |
-| ID           | `list-api-keys`                                      |
-| Visibility   | Enabled                                              |
-| Availability | Only when running                                    |
-| Group        | API Keys                                             |
-| Purpose      | List all API keys with bucket access and permissions |
-
-### Grant Bucket Access to Key
-
-| Property     | Value                               |
-| ------------ | ----------------------------------- |
-| ID           | `grant-bucket-to-key`               |
-| Visibility   | Enabled                             |
-| Availability | Only when running                   |
-| Group        | Keys                                |
-| Purpose      | Grant an API key access to a bucket |
-
-**Inputs:** Bucket (select), API keys (multi-select), read (default: on), write (default: on), owner (default: off).
-
----
-
-## Backups and Restore
-
-**Included in backup:**
-
-- `main` volume — all metadata, block storage, and configuration
-
-**Restore behavior:**
-
-- All buckets, keys, and data are restored
-- Admin token and cluster layout are preserved
-
----
-
-## Health Checks
-
-| Check  | Method                                  | Messages                                                      |
-| ------ | --------------------------------------- | ------------------------------------------------------------- |
-| Garage | HTTP GET `http://127.0.0.1:3903/health` | Success: "Garage is healthy" / Error: "Garage is not healthy" |
-
----
+Both are rewritten on **every** init, not seeded once — they are a fixed pair of minimal account files, and a hand edit is replaced at the next init, update, or restore.
 
 ## Dependencies
 
-None. Garage is a standalone application.
+None. Other services use Garage as an S3 backend by pointing at its API address and a key you create here.
 
----
+## Network Access and Interfaces
+
+Three interfaces, each on its own host so they can be exposed independently.
+
+| Interface      | Id      | Type | Port | Description                          |
+| -------------- | ------- | ---- | ---- | ------------------------------------ |
+| S3 API         | `s3`    | api  | 3900 | The S3-compatible object storage API |
+| S3 Web Hosting | `web`   | api  | 3902 | Serves static sites out of buckets   |
+| Admin API      | `admin` | api  | 3903 | Garage's administration API          |
+
+The RPC port used between cluster members is bound inside the container but exported as no interface, because this is a single-node deployment.
+
+**The admin API is protected only by its token.** Exposing that interface beyond the LAN hands full administrative control to anyone holding the token, so treat it accordingly — it is a separate host precisely so it can be left unexposed while the S3 API is not.
+
+## Installation and First-Run Flow
+
+Install does more here than in most packages, because a Garage cluster is not usable until it has a layout — and a single-node cluster still needs one.
+
+1. **`passwd` and `group` are written**, since the image has neither.
+2. **`rpc_secret` is generated** into `garage.toml`.
+3. **The cluster is bootstrapped.** Garage is started in a temporary subcontainer, its node id read, a layout assigned to it in a single zone, and that layout applied. This is reported as an install progress phase and is bounded at five minutes; if it does not succeed, init fails and StartOS rolls the install back.
+4. **A `critical` task is raised** pointing at Set Admin Token — see [Tasks](#tasks).
+
+After that, the working order is: create an API key, create a bucket, then grant the key access to the bucket. A key with no grant can authenticate but sees nothing.
+
+## Actions
+
+Nine actions. All but one require the service to be running, since they drive Garage's own CLI against a live node.
+
+### Set / Reset Admin Token
+
+Generates the token the admin API authenticates with. The action renames itself — "Set Admin Token" when none exists, "Reset Admin Token" afterwards — so it reads correctly both as the install task and as a rotation later.
+
+- **What it changes:** `admin_token` in `garage.toml`.
+- **Availability:** running or stopped, unlike the rest.
+- **Repeat safety:** safe to re-run, but **it invalidates the current token**; anything using the admin API must be updated.
+- **Outputs:** the token, masked and copyable, shown once.
+
+### Create Bucket, List Buckets, Delete Bucket
+
+**Create Bucket** makes an empty bucket and returns its id, object count, and size.
+
+**List Buckets** reports every bucket with its id, object count, size, and the keys authorized against it — the quickest way to see whether a key has been granted access.
+
+**Delete Bucket** removes one or more buckets, selected from a live list. It is **destructive and not reversible**: the bucket and everything in it go. If some deletions fail it reports a partial result naming which, rather than failing the whole run.
+
+### Create API Key, List API Keys, Delete API Key
+
+**Create API Key** issues an S3 access key and secret. The secret is shown once.
+
+**List API Keys** reports the keys that exist.
+
+**Delete API Key** revokes one or more, selected from a live list. Anything authenticating with a deleted key stops working immediately.
+
+### Grant Bucket Access to Key
+
+Grants a key read, write, and/or owner permission on a bucket. At least one permission must be selected; the action refuses an empty grant rather than silently doing nothing.
+
+This is the step that connects the two halves — a key and a bucket created separately have no relationship until it runs.
+
+### Cluster Status
+
+Read-only: the node's view of the cluster, its layout, and its health.
+
+## Tasks
+
+One task, raised at install, and it blocks the service until you clear it.
+
+| Task            | Severity   | Raised when                          | Cleared when    |
+| --------------- | ---------- | ------------------------------------ | --------------- |
+| Set Admin Token | `critical` | At init, while no admin token is set | The action runs |
+
+`critical` because the admin API would otherwise be reachable with no token configured at all. It is raised by a condition rather than unconditionally, so a restored install that already has a token does not see it.
+
+## Health Checks
+
+One check, on the daemon.
+
+| Check             | Method                                   | Grace Period |
+| ----------------- | ---------------------------------------- | ------------ |
+| `garage` "Garage" | HTTP `GET /health` on the admin API port | SDK default  |
+
+It probes Garage's own health endpoint rather than only the port, so a pass means the node considers itself operational — including its layout. A failure after a period of running points at the daemon or its storage; the service logs name it.
+
+## Backups and Restore
+
+The `main` volume is copied wholesale — `sdk.Backups.ofVolumes('main')`. No dump step and nothing excluded.
+
+- **Included:** every stored object, the metadata database, the cluster layout, `garage.toml` with the RPC secret and admin token, and the account files.
+- **Restore:** complete, and no re-bootstrap happens — the layout is part of the backup, so the install-time bootstrap does not run again and the admin-token task is not raised. Buckets, keys, and grants all come back.
+
+The size implication is direct: the backup contains every object stored in every bucket.
 
 ## Limitations and Differences
 
-1. **Single-node only** — replication factor is fixed at 1; multi-node clusters are not supported
-2. **Fixed database engine** — always uses LMDB; cannot switch to SQLite or other engines
-3. **Fixed S3 region** — always `garage`; cannot be changed
-4. **No configurable bind addresses** — all ports are fixed
-5. **No consistency mode selection** — always `consistent`
-
----
-
-## What Is Unchanged from Upstream
-
-- Full S3 API compatibility (GET, PUT, DELETE, multipart uploads, etc.)
-- Bucket and key management via CLI/API
-- S3 website hosting
-- Admin API
-- LMDB metadata engine performance characteristics
-- All client compatibility (AWS CLI, s3cmd, rclone, MinIO Client, etc.)
-
----
-
-## Contributing
-
-Build and development workflow follow the StartOS packaging guide: <https://docs.start9.com/packaging>. Keep `README.md`, `instructions.md`, and `AGENTS.md` in sync with any change to user-visible behavior or package structure.
+1. **Single node.** The replication factor is pinned to 1 and no RPC interface is exported; this package does not join or form a multi-node cluster.
+2. **Buckets and keys are managed through actions**, not through a web console — Garage ships none.
+3. **A key and a bucket are unrelated until granted.** Creating both is not enough to use them together.
+4. **The admin API's only protection is its token.** Exposing that interface publicly exposes administrative control.
+5. **Deleting a bucket destroys its contents**, and deleting a key immediately breaks anything using it. Neither is reversible.
+6. **`passwd` and `group` are package-supplied and rewritten every init**, because the upstream image ships neither.
+7. **No riscv64 build.** x86_64 and aarch64 only.
 
 ---
 
@@ -276,24 +194,38 @@ Build and development workflow follow the StartOS packaging guide: <https://docs
 ```yaml
 package_id: garage
 image: dxflrs/garage
-architectures: [x86_64, aarch64]
+architectures:
+  - x86_64
+  - aarch64
+subcontainers:
+  - garage-sub # the running daemon
+  - garage-init-sub # install only; bootstraps the cluster layout
+  - garage-action-sub # temporary; every action's CLI
 volumes:
   main: /data
-ports:
-  s3_api: 3900
-  s3_web: 3902
-  admin_api: 3903
-dependencies: none
+file_models:
+  - /data/garage.toml
+  - /data/passwd # mounted read-only at /etc/passwd
+  - /data/group # mounted read-only at /etc/group
 startos_managed_env_vars:
   - GARAGE_CONFIG_FILE
+dependencies: []
+interfaces:
+  s3: { type: api, port: 3900 }
+  web: { type: api, port: 3902 }
+  admin: { type: api, port: 3903 }
 actions:
-  - reset-admin-token
+  - reset-admin-token # renames itself to "Set Admin Token" when unset
   - cluster-status
   - create-bucket
-  - delete-bucket
   - list-buckets
+  - delete-bucket
   - create-api-key
-  - delete-api-key
   - list-api-keys
+  - delete-api-key
   - grant-bucket-to-key
+tasks:
+  - { action: reset-admin-token, severity: critical }
+health_checks:
+  - garage # displayed "Garage"; probes the admin API's /health
 ```

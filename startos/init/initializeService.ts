@@ -10,6 +10,8 @@ import {
   garageMounts,
 } from '../utils'
 
+// Install has to bootstrap the layout, not just start the daemon: a Garage node
+// with no applied layout answers its health checks and stores nothing.
 export const initializeService = sdk.setupOnInit(
   async (effects, kind, progress) => {
     await passwdFile.write(effects, 'root:x:0:0:root:/root:/bin/sh\n')

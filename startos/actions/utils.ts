@@ -7,6 +7,8 @@ type Effects = Parameters<typeof sdk.SubContainer.of>[0]
  * Create a garage SubContainer ready for CLI commands.
  * The garage.toml lives on the volume at /data/garage.toml.
  */
+// Every action drives the CLI in a fresh subcontainer built here, never in the
+// running daemon's. Add new ones through this helper.
 export async function createGarageSub(effects: Effects) {
   const sub = sdk.SubContainer.of(
     effects,
