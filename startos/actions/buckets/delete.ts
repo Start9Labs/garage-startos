@@ -31,7 +31,9 @@ const inputSpec = InputSpec.of({
 
     return {
       name: 'Buckets',
-      description: `${buckets.length} bucket(s) available. Select one or more to delete.`,
+      description: i18n(
+        'Only an empty bucket can be deleted. Empty it from your S3 client first.',
+      ),
       warning: null,
       default: [],
       values,
@@ -48,7 +50,7 @@ export const deleteBucket = sdk.Action.withInput(
     name: i18n('Delete Bucket'),
     description: i18n('Delete an S3 bucket by name'),
     warning: i18n(
-      'This will permanently delete the bucket and all its contents.',
+      'Deleted buckets cannot be recovered, and every API key loses its access to them. Garage refuses to delete a bucket that still holds objects.',
     ),
     allowedStatuses: 'only-running',
     group: 'Buckets',
@@ -74,7 +76,7 @@ export const deleteBucket = sdk.Action.withInput(
         { env },
       )
       if (result.exitCode !== 0) {
-        errors.push(`${name}: ${String(result.stderr || result.stdout)}`)
+        errors.push(`${name}: ${String(result.stderr || result.stdout).trim()}`)
       } else {
         deleted.push(name)
       }
@@ -93,8 +95,14 @@ export const deleteBucket = sdk.Action.withInput(
       return {
         version: '1' as const,
         title: 'Partial Deletion',
-        message: `${message}\n\nFailed to delete:\n${errors.join('\n')}`,
-        result: null,
+        message: `${message} ${i18n('Garage refused to delete the buckets below.')}`,
+        result: {
+          type: 'multiline',
+          value: errors.join('\n'),
+          copyable: true,
+          masked: false,
+          qr: false,
+        },
       }
     }
 

@@ -32,18 +32,30 @@ const dict = {
   'List all S3 API keys': 23,
   'Delete API Key': 24,
   'Delete an S3 API key by its key ID': 25,
-  'This will permanently delete the API key.': 26,
+  'Anything using a deleted key loses access to Garage immediately. This cannot be undone.': 26,
   'Delete Bucket': 27,
   'Delete an S3 bucket by name': 28,
-  'This will permanently delete the bucket and all its contents.': 29,
+  'Deleted buckets cannot be recovered, and every API key loses its access to them. Garage refuses to delete a bucket that still holds objects.': 29,
   'Grant Bucket Access to Keys': 30,
-  'Allow a specific API key to access a bucket': 31,
+  'Set the permissions one or more API keys have on a bucket': 31,
   'Cluster Status': 32,
   'Show the status of the Garage cluster': 33,
 
   // init tasks
   'Set your admin API token': 34,
   'Bootstrapping the Garage cluster': 35,
+
+  // action inputs and results
+  'Only an empty bucket can be deleted. Empty it from your S3 client first.': 36,
+  'Garage refused to delete the buckets below.': 37,
+  'Garage refused to delete the API keys below.': 38,
+  'Garage refused to change the permissions of the API keys below.': 39,
+  'Each selected key is left with exactly the permissions turned on below. A permission it already had on this bucket is removed if it is turned off here.': 40,
+  'Download and list the objects in the bucket.': 41,
+  'Upload, replace and delete objects in the bucket.': 42,
+  "Change the bucket's website and CORS settings, and delete the bucket.": 43,
+  'The name S3 clients use for this bucket. Lowercase letters, numbers, hyphens and dots.': 44,
+  'A label to tell keys apart in lists. It is not part of the credentials.': 45,
 } as const
 
 /**

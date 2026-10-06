@@ -35,9 +35,9 @@ Buckets configured for website hosting are served on the **S3 Web Hosting** inte
 
 - **Reset Admin Token** — generate a new admin API token, invalidating the previous one. Use it to rotate the token or recover if you've lost it.
 - **Cluster Status** — show the healthy/unhealthy nodes in the cluster with their IDs, addresses, and roles.
-- **Create Bucket**, **List Buckets**, **Delete Bucket** — manage S3 buckets. Bucket names must be lowercase, 1–63 characters, with hyphens or dots allowed.
+- **Create Bucket**, **List Buckets**, **Delete Bucket** — manage S3 buckets. Bucket names are 2–63 lowercase letters, numbers, hyphens or dots, starting and ending with a letter or number. Garage deletes only an empty bucket: remove its objects with your S3 client first.
 - **Create API Key**, **List API Keys**, **Delete API Key** — manage S3 access key / secret key pairs. The secret is shown once at creation; save it then.
-- **Grant Bucket Access to Keys** — authorise one or more API keys against a bucket. Pick the bucket, pick the keys, and toggle read / write / owner.
+- **Grant Bucket Access to Keys** — authorise one or more API keys against a bucket. Pick the bucket, pick the keys, and toggle read / write / owner. A permission you leave off is removed from each selected key on that bucket.
 
 ## Backups, restore, and uninstall
 

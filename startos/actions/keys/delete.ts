@@ -31,7 +31,7 @@ const inputSpec = InputSpec.of({
 
     return {
       name: 'API Keys',
-      description: `${keys.length} key(s) available. Select one or more to delete.`,
+      description: null,
       warning: null,
       default: [],
       values,
@@ -47,7 +47,9 @@ export const deleteApiKey = sdk.Action.withInput(
   async ({ effects }) => ({
     name: i18n('Delete API Key'),
     description: i18n('Delete an S3 API key by its key ID'),
-    warning: i18n('This will permanently delete the API key.'),
+    warning: i18n(
+      'Anything using a deleted key loses access to Garage immediately. This cannot be undone.',
+    ),
     allowedStatuses: 'only-running',
     group: 'API Keys',
     visibility: 'enabled',
@@ -72,7 +74,9 @@ export const deleteApiKey = sdk.Action.withInput(
         { env },
       )
       if (result.exitCode !== 0) {
-        errors.push(`${keyId}: ${String(result.stderr || result.stdout)}`)
+        errors.push(
+          `${keyId}: ${String(result.stderr || result.stdout).trim()}`,
+        )
       } else {
         deleted.push(keyId)
       }
@@ -91,8 +95,14 @@ export const deleteApiKey = sdk.Action.withInput(
       return {
         version: '1' as const,
         title: 'Partial Deletion',
-        message: `${message}\n\nFailed to delete:\n${errors.join('\n')}`,
-        result: null,
+        message: `${message} ${i18n('Garage refused to delete the API keys below.')}`,
+        result: {
+          type: 'multiline',
+          value: errors.join('\n'),
+          copyable: true,
+          masked: false,
+          qr: false,
+        },
       }
     }
 

@@ -18,14 +18,22 @@ Freshly scaffolded? Work the
 guide page, not a file in this repo — read it, don't copy it in.
 
 Keep `README.md` (technical reference for an AI support or administering agent) and
-`instructions.md` (end-user docs) in sync with your changes.
+`instructions.md` (end-user docs) in sync with your changes. This file restates neither:
+whoever changes the package has both, so it carries only what they don't — repo mechanics,
+a change that looks right and is not, where the next thing gets added, a naming trap, a
+build or test invocation particular to this repo.
 
-**Bugs and feature requests are GitHub issues on this repo** — file them as you find them.
+**Fix a defect you spot rather than reporting it** — you have the package open and the
+context to be sure. File **a GitHub issue on this repo** only when the call isn't yours to
+make: you can't pin the cause down, two defensible fixes exist, or it's too large to ride on
+the work in hand. An open issue is a report, not a queue — implement one when you're asked
+to or when it's labelled `Approved`, then close it with `Closes #<n>`.
+
 Don't record work in the repo instead: no `TODO.md`, no `NOTES.md`, no `PLAN.md`. What you
 verified, tried, and decided belongs in the commit message and the PR body.
 
 ## This repo
 
-- **`passwd` and `group` are mounted as individual read-only files, and written on every init.** The upstream image is built from scratch and ships neither, so Garage cannot resolve its own user without them. Don't move them into the volume root's ordinary contents or seed them install-only.
-- **`replication_factor` stays 1 and no RPC interface is exported.** This is a single-node deployment; raising the factor leaves writes unable to satisfy a quorum against a cluster of one.
-- **The `garage bucket list` / `key list` parsers split on two-or-more spaces and validate the id column.** They are parsing human-readable CLI output, so an upstream format change breaks them silently. Re-check both after a version bump.
+- **Keep `passwd` and `group` written on every init and mounted as individual read-only files** — the scratch image ships neither, and Garage cannot resolve its own user without them.
+- **Don't raise `replication_factor` or export the RPC port** — a cluster of one cannot satisfy a larger quorum.
+- **Re-check `parseBucketList` / `parseKeyList` (`startos/actions/utils.ts`) after every upstream bump** — they split Garage's human-readable CLI tables on two-or-more spaces, so a format change breaks them silently.

@@ -1,6 +1,6 @@
 import { i18n } from '../../i18n'
 import { sdk } from '../../sdk'
-import { createGarageSub } from '../utils'
+import { createGarageSub, parseKeyList } from '../utils'
 
 export const listApiKeys = sdk.Action.withoutInput(
   'list-api-keys',
@@ -21,21 +21,7 @@ export const listApiKeys = sdk.Action.withoutInput(
       env,
     })
 
-    const output = String(result.stdout || '').trim()
-    const lines = output.split('\n').filter((l) => l.trim().length > 0)
-
-    // Parse garage key list output (columns separated by 2+ spaces):
-    // ID                          Created     Name   Expiration
-    // GKbf70f451adfa92b0f7c7c22b  2026-02-14  mykey  never
-    const keys: { id: string; name: string }[] = []
-    for (const line of lines) {
-      const cols = line.split(/\s{2,}/)
-      const id = cols[0]?.trim() ?? ''
-      if (id.startsWith('GK')) {
-        const name = cols[2]?.trim() || id
-        keys.push({ id, name })
-      }
-    }
+    const keys = parseKeyList(String(result.stdout || ''))
 
     if (keys.length === 0) {
       return {

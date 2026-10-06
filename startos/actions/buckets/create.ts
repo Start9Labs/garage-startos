@@ -7,7 +7,9 @@ const { InputSpec, Value } = sdk
 const inputSpec = InputSpec.of({
   bucketName: Value.text({
     name: 'Bucket Name',
-    description: 'Name for the new S3 bucket (lowercase, hyphens allowed)',
+    description: i18n(
+      'The name S3 clients use for this bucket. Lowercase letters, numbers, hyphens and dots.',
+    ),
     required: true,
     default: null,
     placeholder: 'my-bucket',
