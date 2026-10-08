@@ -128,7 +128,7 @@ Generates the token the admin API authenticates with. The action renames itself 
 
 **List Buckets** reports every bucket with its id, object count, size, and the keys authorized against it — the quickest way to see whether a key has been granted access.
 
-**Delete Bucket** removes one or more buckets, selected from a live list. It is **destructive and not reversible**: the bucket and everything in it go. If some deletions fail it reports a partial result naming which, rather than failing the whole run.
+**Delete Bucket** removes one or more buckets, selected from a live list. **Garage deletes only an empty bucket** and refuses one that still holds objects, so empty it from an S3 client first. A deletion is not reversible, and every key loses its grant on the bucket. If some deletions fail it reports the ones that succeeded and lists Garage's error for each failure in a copyable field, rather than failing the whole run.
 
 ### Create API Key, List API Keys, Delete API Key
 
@@ -136,11 +136,11 @@ Generates the token the admin API authenticates with. The action renames itself 
 
 **List API Keys** reports the keys that exist.
 
-**Delete API Key** revokes one or more, selected from a live list. Anything authenticating with a deleted key stops working immediately.
+**Delete API Key** revokes one or more, selected from a live list. Anything authenticating with a deleted key stops working immediately. Partial failures are reported the same way as Delete Bucket's.
 
-### Grant Bucket Access to Key
+### Grant Bucket Access to Keys
 
-Grants a key read, write, and/or owner permission on a bucket. At least one permission must be selected; the action refuses an empty grant rather than silently doing nothing.
+Sets the permissions one or more keys have on a bucket. No bucket is preselected. **Read** downloads and lists objects; **Write** uploads, replaces and deletes them; **Owner** changes the bucket's website and CORS settings and can delete the bucket. Each selected key is left with exactly the permissions turned on: one turned off is revoked if the key held it. At least one permission must be selected; the action refuses an empty grant rather than silently doing nothing. Partial failures are reported the same way as Delete Bucket's.
 
 This is the step that connects the two halves — a key and a bucket created separately have no relationship until it runs.
 
@@ -183,7 +183,7 @@ The size implication is direct: the backup contains every object stored in every
 2. **Buckets and keys are managed through actions**, not through a web console — Garage ships none.
 3. **A key and a bucket are unrelated until granted.** Creating both is not enough to use them together.
 4. **The admin API's only protection is its token.** Exposing that interface publicly exposes administrative control.
-5. **Deleting a bucket destroys its contents**, and deleting a key immediately breaks anything using it. Neither is reversible.
+5. **Only an empty bucket can be deleted**, and deleting a key immediately breaks anything using it. Neither deletion is reversible.
 6. **`passwd` and `group` are package-supplied and rewritten every init**, because the upstream image ships neither.
 7. **No riscv64 build.** x86_64 and aarch64 only.
 

@@ -1,6 +1,6 @@
 import { i18n } from '../../i18n'
 import { sdk } from '../../sdk'
-import { createGarageSub } from '../utils'
+import { createGarageSub, parseBucketList } from '../utils'
 
 export const listBuckets = sdk.Action.withoutInput(
   'list-buckets',
@@ -21,21 +21,7 @@ export const listBuckets = sdk.Action.withoutInput(
       env,
     })
 
-    const output = String(result.stdout || '').trim()
-    const lines = output.split('\n').filter((l) => l.trim().length > 0)
-
-    // Parse garage bucket list output (columns separated by 2+ spaces):
-    // ID                Created     Global aliases  Local aliases
-    // b60617679cab55bf  2026-02-14  test-bucket
-    const buckets: { id: string; name: string }[] = []
-    for (const line of lines) {
-      const cols = line.split(/\s{2,}/)
-      const id = cols[0]?.trim() ?? ''
-      if (/^[0-9a-f]+$/.test(id)) {
-        const name = cols[2]?.trim() || id
-        buckets.push({ id, name })
-      }
-    }
+    const buckets = parseBucketList(String(result.stdout || ''))
 
     if (buckets.length === 0) {
       return {

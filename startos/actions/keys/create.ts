@@ -7,7 +7,9 @@ const { InputSpec, Value } = sdk
 const inputSpec = InputSpec.of({
   keyName: Value.text({
     name: 'Key Name',
-    description: 'A friendly name for this API key',
+    description: i18n(
+      'A label to tell keys apart in lists. It is not part of the credentials.',
+    ),
     required: true,
     default: null,
     placeholder: 'my-app-key',

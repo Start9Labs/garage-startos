@@ -16,7 +16,7 @@ const inputSpec = InputSpec.of({
         name: 'Bucket',
         description: null,
         warning: 'No buckets found. Create one first.',
-        default: '_none',
+        default: null,
         values: { _none: 'No buckets available' } as Record<string, string>,
         disabled: ['_none'],
       }
@@ -29,9 +29,9 @@ const inputSpec = InputSpec.of({
 
     return {
       name: 'Bucket',
-      description: 'Select the bucket to grant access to',
+      description: null,
       warning: null,
-      default: buckets[0].name,
+      default: null,
       values,
     }
   }),
@@ -61,7 +61,9 @@ const inputSpec = InputSpec.of({
 
     return {
       name: 'API Keys',
-      description: `${keys.length} key(s) available. Select one or more to grant access.`,
+      description: i18n(
+        'Each selected key is left with exactly the permissions turned on below. A permission it already had on this bucket is removed if it is turned off here.',
+      ),
       warning: null,
       default: [],
       values,
@@ -71,18 +73,19 @@ const inputSpec = InputSpec.of({
   }),
   read: Value.toggle({
     name: 'Read',
-    description: 'Allow reading objects from the bucket',
+    description: i18n('Download and list the objects in the bucket.'),
     default: true,
   }),
   write: Value.toggle({
     name: 'Write',
-    description: 'Allow writing objects to the bucket',
+    description: i18n('Upload, replace and delete objects in the bucket.'),
     default: true,
   }),
   owner: Value.toggle({
     name: 'Owner',
-    description:
-      'Grant owner permissions (delete objects, manage bucket settings)',
+    description: i18n(
+      "Change the bucket's website and CORS settings, and delete the bucket.",
+    ),
     default: false,
   }),
 })
@@ -92,10 +95,12 @@ export const grantBucketToKey = sdk.Action.withInput(
 
   async ({ effects }) => ({
     name: i18n('Grant Bucket Access to Keys'),
-    description: i18n('Allow a specific API key to access a bucket'),
+    description: i18n(
+      'Set the permissions one or more API keys have on a bucket',
+    ),
     warning: null,
     allowedStatuses: 'only-running',
-    group: 'Keys',
+    group: 'API Keys',
     visibility: 'enabled',
   }),
 
@@ -142,7 +147,7 @@ export const grantBucketToKey = sdk.Action.withInput(
       const allowResult = await sub.exec(allowArgs, { env })
       if (allowResult.exitCode !== 0) {
         errors.push(
-          `${keyId}: ${String(allowResult.stderr || allowResult.stdout)}`,
+          `${keyId}: ${String(allowResult.stderr || allowResult.stdout).trim()}`,
         )
         continue
       }
@@ -158,7 +163,7 @@ export const grantBucketToKey = sdk.Action.withInput(
         const denyResult = await sub.exec(denyArgs, { env })
         if (denyResult.exitCode !== 0) {
           errors.push(
-            `${keyId} (deny): ${String(denyResult.stderr || denyResult.stdout)}`,
+            `${keyId} (deny): ${String(denyResult.stderr || denyResult.stdout).trim()}`,
           )
           continue
         }
@@ -180,8 +185,14 @@ export const grantBucketToKey = sdk.Action.withInput(
       return {
         version: '1' as const,
         title: 'Partial Grant',
-        message: `${message}\n\nFailed to grant:\n${errors.join('\n')}`,
-        result: null,
+        message: `${message} ${i18n('Garage refused to change the permissions of the API keys below.')}`,
+        result: {
+          type: 'multiline',
+          value: errors.join('\n'),
+          copyable: true,
+          masked: false,
+          qr: false,
+        },
       }
     }
 
