@@ -72,7 +72,10 @@ export const listApiKeys = sdk.Action.withoutInput(
     return {
       version: '1' as const,
       title: i18n('S3 API Keys'),
-      message: i18n('Found ${count} API key(s). Use "Delete API Key" to remove, or "Grant Bucket Access to Keys" to manage permissions.', { count: keys.length }),
+      message: i18n(
+        'Found ${count} API key(s). Use "Delete API Key" to remove, or "Grant Bucket Access to Keys" to manage permissions.',
+        { count: keys.length },
+      ),
       result: {
         type: 'group' as const,
         value: keyDetails.map((key) => ({

@@ -17,7 +17,10 @@ const inputSpec = InputSpec.of({
         description: null,
         warning: i18n('No buckets found. Create one first.'),
         default: null,
-        values: { _none: i18n('No buckets available') } as Record<string, string>,
+        values: { _none: i18n('No buckets available') } as Record<
+          string,
+          string
+        >,
         disabled: ['_none'],
       }
     }
@@ -47,7 +50,10 @@ const inputSpec = InputSpec.of({
         description: null,
         warning: i18n('No API keys found. Create one first.'),
         default: [],
-        values: { _none: i18n('No API keys available') } as Record<string, string>,
+        values: { _none: i18n('No API keys available') } as Record<
+          string,
+          string
+        >,
         disabled: ['_none'],
         minLength: null,
         maxLength: null,
@@ -119,7 +125,9 @@ export const grantBucketToKey = sdk.Action.withInput(
 
     if (!input.read && !input.write && !input.owner) {
       throw new Error(
-        i18n('At least one permission (Read, Write, or Owner) must be selected.'),
+        i18n(
+          'At least one permission (Read, Write, or Owner) must be selected.',
+        ),
       )
     }
 
@@ -163,7 +171,10 @@ export const grantBucketToKey = sdk.Action.withInput(
         const denyResult = await sub.exec(denyArgs, { env })
         if (denyResult.exitCode !== 0) {
           errors.push(
-            i18n('${keyId} (revoke): ${error}', { keyId, error: String(denyResult.stderr || denyResult.stdout).trim() }),
+            i18n('${keyId} (revoke): ${error}', {
+              keyId,
+              error: String(denyResult.stderr || denyResult.stdout).trim(),
+            }),
           )
           continue
         }
@@ -173,13 +184,27 @@ export const grantBucketToKey = sdk.Action.withInput(
     }
 
     if (errors.length > 0 && granted.length === 0) {
-      throw new Error(i18n('Failed to grant access:\n${errors}', { errors: errors.join('\n') }))
+      throw new Error(
+        i18n('Failed to grant access:\n${errors}', {
+          errors: errors.join('\n'),
+        }),
+      )
     }
 
     const message =
       granted.length === 1
-        ? i18n('Key "${key}" now has ${permissions} access to bucket "${bucket}".', { key: granted[0], permissions: perms, bucket: input.bucketName })
-        : i18n('${count} keys now have ${permissions} access to bucket "${bucket}".', { count: granted.length, permissions: perms, bucket: input.bucketName })
+        ? i18n(
+            'Key "${key}" now has ${permissions} access to bucket "${bucket}".',
+            { key: granted[0], permissions: perms, bucket: input.bucketName },
+          )
+        : i18n(
+            '${count} keys now have ${permissions} access to bucket "${bucket}".',
+            {
+              count: granted.length,
+              permissions: perms,
+              bucket: input.bucketName,
+            },
+          )
 
     if (errors.length > 0) {
       return {

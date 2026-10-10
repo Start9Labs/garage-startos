@@ -92,11 +92,12 @@ export const clusterStatus = sdk.Action.withoutInput(
           .filter((s) => s.nodes.length > 0)
           .map((s) => ({
             type: 'group' as const,
-            name: s.name === 'HEALTHY NODES'
-              ? i18n('Healthy Nodes')
-              : s.name === 'FAILED NODES'
-                ? i18n('Failed Nodes')
-                : s.name,
+            name:
+              s.name === 'HEALTHY NODES'
+                ? i18n('Healthy Nodes')
+                : s.name === 'FAILED NODES'
+                  ? i18n('Failed Nodes')
+                  : s.name,
             description: null,
             value: s.nodes.map((node) => ({
               type: 'group' as const,

@@ -77,7 +77,10 @@ export const listBuckets = sdk.Action.withoutInput(
     return {
       version: '1' as const,
       title: i18n('S3 Buckets'),
-      message: i18n('Found ${count} bucket(s). Use "Delete Bucket" to remove, or "Grant Bucket Access to Keys" to manage permissions.', { count: buckets.length }),
+      message: i18n(
+        'Found ${count} bucket(s). Use "Delete Bucket" to remove, or "Grant Bucket Access to Keys" to manage permissions.',
+        { count: buckets.length },
+      ),
       result: {
         type: 'group' as const,
         value: bucketDetails.map((b) => ({

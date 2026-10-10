@@ -17,7 +17,10 @@ const inputSpec = InputSpec.of({
         description: null,
         warning: i18n('No buckets found.'),
         default: [],
-        values: { _none: i18n('No buckets available') } as Record<string, string>,
+        values: { _none: i18n('No buckets available') } as Record<
+          string,
+          string
+        >,
         disabled: ['_none'],
         minLength: null,
         maxLength: null,
@@ -83,13 +86,21 @@ export const deleteBucket = sdk.Action.withInput(
     }
 
     if (errors.length > 0 && deleted.length === 0) {
-      throw new Error(i18n('Failed to delete bucket(s):\n${errors}', { errors: errors.join('\n') }))
+      throw new Error(
+        i18n('Failed to delete bucket(s):\n${errors}', {
+          errors: errors.join('\n'),
+        }),
+      )
     }
 
     const message =
       deleted.length === 1
-        ? i18n('Bucket "${name}" has been permanently deleted.', { name: deleted[0] })
-        : i18n('${count} buckets have been permanently deleted.', { count: deleted.length })
+        ? i18n('Bucket "${name}" has been permanently deleted.', {
+            name: deleted[0],
+          })
+        : i18n('${count} buckets have been permanently deleted.', {
+            count: deleted.length,
+          })
 
     if (errors.length > 0) {
       return {
@@ -108,7 +119,8 @@ export const deleteBucket = sdk.Action.withInput(
 
     return {
       version: '1' as const,
-      title: deleted.length === 1 ? i18n('Bucket Deleted') : i18n('Buckets Deleted'),
+      title:
+        deleted.length === 1 ? i18n('Bucket Deleted') : i18n('Buckets Deleted'),
       message,
       result: null,
     }

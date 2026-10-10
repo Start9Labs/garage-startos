@@ -51,7 +51,11 @@ export const createApiKey = sdk.Action.withInput(
     const secretKeyMatch = stdout.match(/Secret key:\s*(\S+)/)
 
     if (!accessKeyMatch || !secretKeyMatch) {
-      throw new Error(i18n('Garage created the key but its credentials could not be read. Delete it and create a new key.'))
+      throw new Error(
+        i18n(
+          'Garage created the key but its credentials could not be read. Delete it and create a new key.',
+        ),
+      )
     }
     const accessKeyId = accessKeyMatch[1]
     const secretAccessKey = secretKeyMatch[1]
@@ -59,7 +63,10 @@ export const createApiKey = sdk.Action.withInput(
     return {
       version: '1' as const,
       title: i18n('API Key Created'),
-      message: i18n('API key "${name}" created successfully. Save the secret key now — it cannot be retrieved later.', { name: input.keyName }),
+      message: i18n(
+        'API key "${name}" created successfully. Save the secret key now — it cannot be retrieved later.',
+        { name: input.keyName },
+      ),
       result: {
         type: 'group',
         value: [

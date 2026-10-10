@@ -70,7 +70,9 @@ export const createBucket = sdk.Action.withInput(
     return {
       version: '1' as const,
       title: i18n('Bucket Created'),
-      message: i18n('Bucket "${name}" created successfully.', { name: input.bucketName }),
+      message: i18n('Bucket "${name}" created successfully.', {
+        name: input.bucketName,
+      }),
       result: {
         type: 'group' as const,
         value: [
