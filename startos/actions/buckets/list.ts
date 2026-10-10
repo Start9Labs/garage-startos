@@ -10,7 +10,7 @@ export const listBuckets = sdk.Action.withoutInput(
     description: i18n('List all S3 buckets'),
     warning: null,
     allowedStatuses: 'only-running',
-    group: 'Buckets',
+    group: i18n('Buckets'),
     visibility: 'enabled',
   }),
 
@@ -26,8 +26,8 @@ export const listBuckets = sdk.Action.withoutInput(
     if (buckets.length === 0) {
       return {
         version: '1' as const,
-        title: 'S3 Buckets',
-        message: 'No buckets found.',
+        title: i18n('S3 Buckets'),
+        message: i18n('No buckets found.'),
         result: null,
       }
     }
@@ -76,8 +76,8 @@ export const listBuckets = sdk.Action.withoutInput(
 
     return {
       version: '1' as const,
-      title: 'S3 Buckets',
-      message: `Found ${buckets.length} bucket(s). Use "Delete Bucket" to remove, or "Grant Bucket Access to Key" to manage permissions.`,
+      title: i18n('S3 Buckets'),
+      message: i18n('Found ${count} bucket(s). Use "Delete Bucket" to remove, or "Grant Bucket Access to Keys" to manage permissions.', { count: buckets.length }),
       result: {
         type: 'group' as const,
         value: bucketDetails.map((b) => ({
@@ -87,7 +87,7 @@ export const listBuckets = sdk.Action.withoutInput(
           value: [
             {
               type: 'single' as const,
-              name: 'Bucket ID',
+              name: i18n('Bucket ID'),
               description: null,
               value: b.id,
               masked: false,
@@ -96,7 +96,7 @@ export const listBuckets = sdk.Action.withoutInput(
             },
             {
               type: 'single' as const,
-              name: 'Objects',
+              name: i18n('Objects'),
               description: null,
               value: b.objects,
               masked: false,
@@ -105,7 +105,7 @@ export const listBuckets = sdk.Action.withoutInput(
             },
             {
               type: 'single' as const,
-              name: 'Size',
+              name: i18n('Size'),
               description: null,
               value: b.size,
               masked: false,
@@ -114,12 +114,12 @@ export const listBuckets = sdk.Action.withoutInput(
             },
             {
               type: 'single' as const,
-              name: 'Authorized Keys',
+              name: i18n('Authorized Keys'),
               description: null,
               value:
                 b.authorizedKeys.length > 0
                   ? b.authorizedKeys.join(', ')
-                  : 'No keys authorized',
+                  : i18n('No keys authorized'),
               masked: false,
               copyable: false,
               qr: false,

@@ -6,20 +6,21 @@ const { InputSpec, Value } = sdk
 
 const inputSpec = InputSpec.of({
   bucketName: Value.text({
-    name: 'Bucket Name',
+    name: i18n('Bucket Name'),
     description: i18n(
       'The name S3 clients use for this bucket. Lowercase letters, numbers, hyphens and dots.',
     ),
     required: true,
     default: null,
-    placeholder: 'my-bucket',
+    placeholder: i18n('my-bucket'),
     minLength: 1,
     maxLength: 63,
     patterns: [
       {
         regex: '^[a-z0-9][a-z0-9.-]*[a-z0-9]$',
-        description:
+        description: i18n(
           'Must start and end with lowercase letter or number, may contain hyphens and dots',
+        ),
       },
     ],
     inputmode: 'text',
@@ -34,7 +35,7 @@ export const createBucket = sdk.Action.withInput(
     description: i18n('Create a new S3 bucket'),
     warning: null,
     allowedStatuses: 'only-running',
-    group: 'Buckets',
+    group: i18n('Buckets'),
     visibility: 'enabled',
   }),
 
@@ -62,20 +63,20 @@ export const createBucket = sdk.Action.withInput(
     const objectsMatch = infoOut.match(/Objects:\s*(\d+)/)
     const sizeMatch = infoOut.match(/Size:\s*(.+)/)
 
-    const bucketId = bucketIdMatch?.[1] ?? 'unknown'
+    const bucketId = bucketIdMatch?.[1] ?? i18n('unknown')
     const objects = objectsMatch?.[1] ?? '0'
     const size = sizeMatch?.[1]?.trim() ?? '0 B'
 
     return {
       version: '1' as const,
-      title: 'Bucket Created',
-      message: `Bucket "${input.bucketName}" created successfully.`,
+      title: i18n('Bucket Created'),
+      message: i18n('Bucket "${name}" created successfully.', { name: input.bucketName }),
       result: {
         type: 'group' as const,
         value: [
           {
             type: 'single' as const,
-            name: 'Bucket Name',
+            name: i18n('Bucket Name'),
             description: null,
             value: input.bucketName,
             masked: false,
@@ -84,7 +85,7 @@ export const createBucket = sdk.Action.withInput(
           },
           {
             type: 'single' as const,
-            name: 'Bucket ID',
+            name: i18n('Bucket ID'),
             description: null,
             value: bucketId,
             masked: false,
@@ -93,7 +94,7 @@ export const createBucket = sdk.Action.withInput(
           },
           {
             type: 'single' as const,
-            name: 'Objects',
+            name: i18n('Objects'),
             description: null,
             value: objects,
             masked: false,
@@ -102,7 +103,7 @@ export const createBucket = sdk.Action.withInput(
           },
           {
             type: 'single' as const,
-            name: 'Size',
+            name: i18n('Size'),
             description: null,
             value: size,
             masked: false,

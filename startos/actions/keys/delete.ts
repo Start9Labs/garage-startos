@@ -13,11 +13,11 @@ const inputSpec = InputSpec.of({
 
     if (keys.length === 0) {
       return {
-        name: 'API Keys',
+        name: i18n('API Keys'),
         description: null,
-        warning: 'No API keys found.',
+        warning: i18n('No API keys found.'),
         default: [],
-        values: { _none: 'No API keys available' } as Record<string, string>,
+        values: { _none: i18n('No API keys available') } as Record<string, string>,
         disabled: ['_none'],
         minLength: null,
         maxLength: null,
@@ -30,7 +30,7 @@ const inputSpec = InputSpec.of({
     }
 
     return {
-      name: 'API Keys',
+      name: i18n('API Keys'),
       description: null,
       warning: null,
       default: [],
@@ -51,7 +51,7 @@ export const deleteApiKey = sdk.Action.withInput(
       'Anything using a deleted key loses access to Garage immediately. This cannot be undone.',
     ),
     allowedStatuses: 'only-running',
-    group: 'API Keys',
+    group: i18n('API Keys'),
     visibility: 'enabled',
   }),
 
@@ -61,7 +61,7 @@ export const deleteApiKey = sdk.Action.withInput(
 
   async ({ effects, input }) => {
     if (input.keyIds.length === 0) {
-      throw new Error('No API keys selected.')
+      throw new Error(i18n('No API keys selected.'))
     }
 
     const { sub, env } = await createGarageSub(effects)
@@ -83,18 +83,18 @@ export const deleteApiKey = sdk.Action.withInput(
     }
 
     if (errors.length > 0 && deleted.length === 0) {
-      throw new Error(`Failed to delete API key(s):\n${errors.join('\n')}`)
+      throw new Error(i18n('Failed to delete API key(s):\n${errors}', { errors: errors.join('\n') }))
     }
 
     const message =
       deleted.length === 1
-        ? `API key "${deleted[0]}" has been permanently deleted.`
-        : `${deleted.length} API keys have been permanently deleted.`
+        ? i18n('API key "${name}" has been permanently deleted.', { name: deleted[0] })
+        : i18n('${count} API keys have been permanently deleted.', { count: deleted.length })
 
     if (errors.length > 0) {
       return {
         version: '1' as const,
-        title: 'Partial Deletion',
+        title: i18n('Partial Deletion'),
         message: `${message} ${i18n('Garage refused to delete the API keys below.')}`,
         result: {
           type: 'multiline',
@@ -108,7 +108,7 @@ export const deleteApiKey = sdk.Action.withInput(
 
     return {
       version: '1' as const,
-      title: deleted.length === 1 ? 'API Key Deleted' : 'API Keys Deleted',
+      title: deleted.length === 1 ? i18n('API Key Deleted') : i18n('API Keys Deleted'),
       message,
       result: null,
     }

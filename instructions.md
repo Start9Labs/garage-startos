@@ -33,6 +33,8 @@ Buckets configured for website hosting are served on the **S3 Web Hosting** inte
 
 ### Actions
 
+Action forms, empty-list warnings, result labels and messages appear in your selected language (English, Spanish, German, Polish or French). Your bucket and key names, credentials, and Garage's own diagnostic output are not translated.
+
 - **Reset Admin Token** — generate a new admin API token, invalidating the previous one. Use it to rotate the token or recover if you've lost it.
 - **Cluster Status** — show the healthy/unhealthy nodes in the cluster with their IDs, addresses, and roles.
 - **Create Bucket**, **List Buckets**, **Delete Bucket** — manage S3 buckets. Bucket names are 2–63 lowercase letters, numbers, hyphens or dots, starting and ending with a letter or number. Garage deletes only an empty bucket: remove its objects with your S3 client first.

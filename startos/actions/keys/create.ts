@@ -6,13 +6,13 @@ const { InputSpec, Value } = sdk
 
 const inputSpec = InputSpec.of({
   keyName: Value.text({
-    name: 'Key Name',
+    name: i18n('Key Name'),
     description: i18n(
       'A label to tell keys apart in lists. It is not part of the credentials.',
     ),
     required: true,
     default: null,
-    placeholder: 'my-app-key',
+    placeholder: i18n('my-app-key'),
     minLength: 1,
     maxLength: 128,
     patterns: [],
@@ -28,7 +28,7 @@ export const createApiKey = sdk.Action.withInput(
     description: i18n('Create a new S3 API key pair'),
     warning: null,
     allowedStatuses: 'only-running',
-    group: 'API Keys',
+    group: i18n('API Keys'),
     visibility: 'enabled',
   }),
 
@@ -50,19 +50,22 @@ export const createApiKey = sdk.Action.withInput(
     const accessKeyMatch = stdout.match(/Key ID:\s*(\S+)/)
     const secretKeyMatch = stdout.match(/Secret key:\s*(\S+)/)
 
-    const accessKeyId = accessKeyMatch?.[1] ?? 'See output'
-    const secretAccessKey = secretKeyMatch?.[1] ?? 'See output'
+    if (!accessKeyMatch || !secretKeyMatch) {
+      throw new Error(i18n('Garage created the key but its credentials could not be read. Delete it and create a new key.'))
+    }
+    const accessKeyId = accessKeyMatch[1]
+    const secretAccessKey = secretKeyMatch[1]
 
     return {
       version: '1' as const,
-      title: 'API Key Created',
-      message: `API key "${input.keyName}" created successfully. Save the secret key now — it cannot be retrieved later.`,
+      title: i18n('API Key Created'),
+      message: i18n('API key "${name}" created successfully. Save the secret key now — it cannot be retrieved later.', { name: input.keyName }),
       result: {
         type: 'group',
         value: [
           {
             type: 'single',
-            name: 'Access Key ID',
+            name: i18n('Access Key ID'),
             description: null,
             value: accessKeyId,
             masked: false,
@@ -71,7 +74,7 @@ export const createApiKey = sdk.Action.withInput(
           },
           {
             type: 'single',
-            name: 'Secret Access Key',
+            name: i18n('Secret Access Key'),
             description: null,
             value: secretAccessKey,
             masked: true,
