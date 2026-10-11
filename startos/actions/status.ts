@@ -43,7 +43,7 @@ function parseStatusOutput(output: string): Section[] {
         id,
         hostname: cols[1]?.trim() ?? '',
         address: cols[2]?.trim() ?? '',
-        role: cols.slice(3).join(' ').trim() || 'No role assigned',
+        role: cols.slice(3).join(' ').trim() || i18n('No role assigned'),
       })
     }
   }
@@ -76,23 +76,28 @@ export const clusterStatus = sdk.Action.withoutInput(
     if (sections.length === 0 || nodeCount === 0) {
       return {
         version: '1' as const,
-        title: 'Cluster Status',
-        message: 'No healthy nodes found.',
+        title: i18n('Cluster Status'),
+        message: i18n('No healthy nodes found.'),
         result: null,
       }
     }
 
     return {
       version: '1' as const,
-      title: 'Cluster Status',
-      message: `Found ${nodeCount} healthy node(s).`,
+      title: i18n('Cluster Status'),
+      message: i18n('Found ${count} healthy node(s).', { count: nodeCount }),
       result: {
         type: 'group' as const,
         value: sections
           .filter((s) => s.nodes.length > 0)
           .map((s) => ({
             type: 'group' as const,
-            name: s.name,
+            name:
+              s.name === 'HEALTHY NODES'
+                ? i18n('Healthy Nodes')
+                : s.name === 'FAILED NODES'
+                  ? i18n('Failed Nodes')
+                  : s.name,
             description: null,
             value: s.nodes.map((node) => ({
               type: 'group' as const,
@@ -101,7 +106,7 @@ export const clusterStatus = sdk.Action.withoutInput(
               value: [
                 {
                   type: 'single' as const,
-                  name: 'Node ID',
+                  name: i18n('Node ID'),
                   description: null,
                   value: node.id,
                   masked: false,
@@ -110,7 +115,7 @@ export const clusterStatus = sdk.Action.withoutInput(
                 },
                 {
                   type: 'single' as const,
-                  name: 'Address',
+                  name: i18n('Address'),
                   description: null,
                   value: node.address,
                   masked: false,
@@ -119,7 +124,7 @@ export const clusterStatus = sdk.Action.withoutInput(
                 },
                 {
                   type: 'single' as const,
-                  name: 'Role',
+                  name: i18n('Role'),
                   description: null,
                   value: node.role,
                   masked: false,

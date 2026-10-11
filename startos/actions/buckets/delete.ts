@@ -13,11 +13,14 @@ const inputSpec = InputSpec.of({
 
     if (buckets.length === 0) {
       return {
-        name: 'Buckets',
+        name: i18n('Buckets'),
         description: null,
-        warning: 'No buckets found.',
+        warning: i18n('No buckets found.'),
         default: [],
-        values: { _none: 'No buckets available' } as Record<string, string>,
+        values: { _none: i18n('No buckets available') } as Record<
+          string,
+          string
+        >,
         disabled: ['_none'],
         minLength: null,
         maxLength: null,
@@ -30,7 +33,7 @@ const inputSpec = InputSpec.of({
     }
 
     return {
-      name: 'Buckets',
+      name: i18n('Buckets'),
       description: i18n(
         'Only an empty bucket can be deleted. Empty it from your S3 client first.',
       ),
@@ -53,7 +56,7 @@ export const deleteBucket = sdk.Action.withInput(
       'Deleted buckets cannot be recovered, and every API key loses its access to them. Garage refuses to delete a bucket that still holds objects.',
     ),
     allowedStatuses: 'only-running',
-    group: 'Buckets',
+    group: i18n('Buckets'),
     visibility: 'enabled',
   }),
 
@@ -63,7 +66,7 @@ export const deleteBucket = sdk.Action.withInput(
 
   async ({ effects, input }) => {
     if (input.bucketNames.length === 0) {
-      throw new Error('No buckets selected.')
+      throw new Error(i18n('No buckets selected.'))
     }
 
     const { sub, env } = await createGarageSub(effects)
@@ -83,18 +86,26 @@ export const deleteBucket = sdk.Action.withInput(
     }
 
     if (errors.length > 0 && deleted.length === 0) {
-      throw new Error(`Failed to delete bucket(s):\n${errors.join('\n')}`)
+      throw new Error(
+        i18n('Failed to delete bucket(s):\n${errors}', {
+          errors: errors.join('\n'),
+        }),
+      )
     }
 
     const message =
       deleted.length === 1
-        ? `Bucket "${deleted[0]}" has been permanently deleted.`
-        : `${deleted.length} buckets have been permanently deleted.`
+        ? i18n('Bucket "${name}" has been permanently deleted.', {
+            name: deleted[0],
+          })
+        : i18n('${count} buckets have been permanently deleted.', {
+            count: deleted.length,
+          })
 
     if (errors.length > 0) {
       return {
         version: '1' as const,
-        title: 'Partial Deletion',
+        title: i18n('Partial Deletion'),
         message: `${message} ${i18n('Garage refused to delete the buckets below.')}`,
         result: {
           type: 'multiline',
@@ -108,7 +119,8 @@ export const deleteBucket = sdk.Action.withInput(
 
     return {
       version: '1' as const,
-      title: deleted.length === 1 ? 'Bucket Deleted' : 'Buckets Deleted',
+      title:
+        deleted.length === 1 ? i18n('Bucket Deleted') : i18n('Buckets Deleted'),
       message,
       result: null,
     }

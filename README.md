@@ -132,7 +132,7 @@ Generates the token the admin API authenticates with. The action renames itself 
 
 ### Create API Key, List API Keys, Delete API Key
 
-**Create API Key** issues an S3 access key and secret. The secret is shown once.
+**Create API Key** issues an S3 access key and secret. The secret is shown once. If Garage's reply cannot be parsed, the action reports that the key was created but its credentials could not be read, with instructions to delete it and create another; it does not present placeholder credentials.
 
 **List API Keys** reports the keys that exist.
 
@@ -146,7 +146,7 @@ This is the step that connects the two halves — a key and a bucket created sep
 
 ### Cluster Status
 
-Read-only: the node's view of the cluster, its layout, and its health.
+Read-only: the node's view of the cluster, its layout, and its health. The parser keeps Garage's CLI section names for identifying healthy nodes and translates the displayed healthy/failed section headings; node IDs, addresses and upstream role text remain unchanged.
 
 ## Tasks
 

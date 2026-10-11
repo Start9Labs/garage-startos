@@ -10,7 +10,7 @@ export const listApiKeys = sdk.Action.withoutInput(
     description: i18n('List all S3 API keys'),
     warning: null,
     allowedStatuses: 'only-running',
-    group: 'API Keys',
+    group: i18n('API Keys'),
     visibility: 'enabled',
   }),
 
@@ -26,8 +26,8 @@ export const listApiKeys = sdk.Action.withoutInput(
     if (keys.length === 0) {
       return {
         version: '1' as const,
-        title: 'S3 API Keys',
-        message: 'No API keys found.',
+        title: i18n('S3 API Keys'),
+        message: i18n('No API keys found.'),
         result: null,
       }
     }
@@ -71,8 +71,11 @@ export const listApiKeys = sdk.Action.withoutInput(
 
     return {
       version: '1' as const,
-      title: 'S3 API Keys',
-      message: `Found ${keys.length} API key(s). Use "Delete API Key" to remove, or "Grant Bucket Access to Keys" to manage permissions.`,
+      title: i18n('S3 API Keys'),
+      message: i18n(
+        'Found ${count} API key(s). Use "Delete API Key" to remove, or "Grant Bucket Access to Keys" to manage permissions.',
+        { count: keys.length },
+      ),
       result: {
         type: 'group' as const,
         value: keyDetails.map((key) => ({
@@ -82,7 +85,7 @@ export const listApiKeys = sdk.Action.withoutInput(
           value: [
             {
               type: 'single' as const,
-              name: 'Key ID',
+              name: i18n('Key ID'),
               description: null,
               value: key.id,
               masked: false,
@@ -91,12 +94,12 @@ export const listApiKeys = sdk.Action.withoutInput(
             },
             {
               type: 'single' as const,
-              name: 'Bucket Access',
+              name: i18n('Bucket Access'),
               description: null,
               value:
                 key.buckets.length > 0
                   ? key.buckets.join(', ')
-                  : 'No bucket access',
+                  : i18n('No bucket access'),
               masked: false,
               copyable: false,
               qr: false,
