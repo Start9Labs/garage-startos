@@ -217,6 +217,7 @@ export const grantBucketToKey = sdk.Action.withInput(
           copyable: true,
           masked: false,
           qr: false,
+          filename: null,
         },
       }
     }

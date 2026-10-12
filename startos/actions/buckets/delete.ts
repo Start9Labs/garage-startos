@@ -113,6 +113,7 @@ export const deleteBucket = sdk.Action.withInput(
           copyable: true,
           masked: false,
           qr: false,
+          filename: null,
         },
       }
     }

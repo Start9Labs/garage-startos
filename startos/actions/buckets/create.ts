@@ -84,6 +84,7 @@ export const createBucket = sdk.Action.withInput(
             masked: false,
             copyable: true,
             qr: false,
+            launchable: false,
           },
           {
             type: 'single' as const,
@@ -93,6 +94,7 @@ export const createBucket = sdk.Action.withInput(
             masked: false,
             copyable: true,
             qr: false,
+            launchable: false,
           },
           {
             type: 'single' as const,
@@ -102,6 +104,7 @@ export const createBucket = sdk.Action.withInput(
             masked: false,
             copyable: false,
             qr: false,
+            launchable: false,
           },
           {
             type: 'single' as const,
@@ -111,6 +114,7 @@ export const createBucket = sdk.Action.withInput(
             masked: false,
             copyable: false,
             qr: false,
+            launchable: false,
           },
         ],
       },

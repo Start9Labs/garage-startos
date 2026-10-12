@@ -112,6 +112,7 @@ export const clusterStatus = sdk.Action.withoutInput(
                   masked: false,
                   copyable: true,
                   qr: false,
+                  launchable: false,
                 },
                 {
                   type: 'single' as const,
@@ -121,6 +122,7 @@ export const clusterStatus = sdk.Action.withoutInput(
                   masked: false,
                   copyable: true,
                   qr: false,
+                  launchable: false,
                 },
                 {
                   type: 'single' as const,
@@ -130,6 +132,7 @@ export const clusterStatus = sdk.Action.withoutInput(
                   masked: false,
                   copyable: false,
                   qr: false,
+                  launchable: false,
                 },
               ],
             })),
