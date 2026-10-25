@@ -90,7 +90,7 @@ const inputSpec = InputSpec.of({
   owner: Value.toggle({
     name: i18n('Owner'),
     description: i18n(
-      "Change the bucket's website and CORS settings, and delete the bucket.",
+      "Manage the bucket's website, CORS and lifecycle settings, and delete the bucket.",
     ),
     default: false,
   }),

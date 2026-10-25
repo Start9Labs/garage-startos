@@ -39,7 +39,7 @@ Action forms, empty-list warnings, result labels and messages appear in your sel
 - **Cluster Status** — show the healthy/unhealthy nodes in the cluster with their IDs, addresses, and roles.
 - **Create Bucket**, **List Buckets**, **Delete Bucket** — manage S3 buckets. Bucket names are 2–63 lowercase letters, numbers, hyphens or dots, starting and ending with a letter or number. Garage deletes only an empty bucket: remove its objects with your S3 client first.
 - **Create API Key**, **List API Keys**, **Delete API Key** — manage S3 access key / secret key pairs. The secret is shown once at creation; save it then.
-- **Grant Bucket Access to Keys** — authorise one or more API keys against a bucket. Pick the bucket, pick the keys, and toggle read / write / owner. A permission you leave off is removed from each selected key on that bucket.
+- **Grant Bucket Access to Keys** — authorise one or more API keys against a bucket. Pick the bucket, pick the keys, and toggle read / write / owner. A permission you leave off is removed from each selected key on that bucket. Owner permission is required to read or change lifecycle rules, manage website and CORS settings, or delete the bucket.
 
 ## Backups, restore, and uninstall
 
