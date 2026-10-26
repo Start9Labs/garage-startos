@@ -35,7 +35,7 @@
 
 ## Image and Container Runtime
 
-The upstream image is used with only `/etc` and `/proc` added (`Dockerfile`), since StartOS mounts into both and the scratch image ships neither. One subcontainer runs the service.
+The upstream image is used with only `/etc` added (`Dockerfile`), since StartOS cannot start a subcontainer from an image without one and the scratch image ships none. One subcontainer runs the service.
 
 | Property      | Value                                                          |
 | ------------- | -------------------------------------------------------------- |
