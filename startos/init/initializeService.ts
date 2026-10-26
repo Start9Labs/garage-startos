@@ -3,9 +3,15 @@ import { garageToml } from '../fileModels/garage.toml'
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 import { groupFile, passwdFile } from '../fileModels/etc'
-import { garageEnv, adminPort, garageImageId, garageMounts } from '../utils'
+import {
+  garageEnv,
+  garageHealthUrl,
+  garageImageId,
+  garageMounts,
+} from '../utils'
 
-// Cluster health cannot pass until bootstrap applies the first layout.
+// Install has to bootstrap the layout, not just start the daemon: a Garage node
+// with no applied layout answers its health checks and stores nothing.
 export const initializeService = sdk.setupOnInit(
   async (effects, kind, progress) => {
     await passwdFile.write(effects, 'root:x:0:0:root:/root:/bin/sh\n')
@@ -39,9 +45,9 @@ export const initializeService = sdk.setupOnInit(
           ready: {
             display: i18n('Garage'),
             fn: () =>
-              sdk.healthCheck.checkPortListening(effects, adminPort, {
-                successMessage: i18n('Garage is ready for setup'),
-                errorMessage: i18n('Waiting for the Garage admin API'),
+              sdk.healthCheck.checkWebUrl(effects, garageHealthUrl, {
+                successMessage: i18n('Garage is healthy'),
+                errorMessage: i18n('Garage is not healthy'),
               }),
           },
           requires: [],

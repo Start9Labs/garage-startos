@@ -115,8 +115,6 @@ export default {
     110: '${keyId} (revocar): ${error}',
     111: 'mi-bucket',
     112: 'mi-clave-app',
-    113: 'Garage está listo para la configuración',
-    114: 'Esperando la API de administración de Garage',
   },
   de_DE: {
     0: 'Garage',
@@ -232,8 +230,6 @@ export default {
     110: '${keyId} (entziehen): ${error}',
     111: 'mein-bucket',
     112: 'mein-app-schluessel',
-    113: 'Garage ist bereit für die Einrichtung',
-    114: 'Warten auf die Garage-Admin-API',
   },
   pl_PL: {
     0: 'Garage',
@@ -349,8 +345,6 @@ export default {
     110: '${keyId} (odebranie): ${error}',
     111: 'moj-bucket',
     112: 'moj-klucz-aplikacji',
-    113: 'Garage jest gotowy do konfiguracji',
-    114: 'Oczekiwanie na API administracyjne Garage',
   },
   fr_FR: {
     0: 'Garage',
@@ -466,7 +460,5 @@ export default {
     110: '${keyId} (révocation) : ${error}',
     111: 'mon-bucket',
     112: 'ma-cle-application',
-    113: 'Garage est prêt pour la configuration',
-    114: 'En attente de l’API d’administration de Garage',
   },
 } satisfies Record<string, LangDict>

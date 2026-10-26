@@ -35,11 +35,11 @@
 
 ## Image and Container Runtime
 
-The upstream image is used unmodified, and one subcontainer runs the service.
+The upstream image is used with only `/etc` and `/proc` added (`Dockerfile`), since StartOS mounts into both and the scratch image ships neither. One subcontainer runs the service.
 
 | Property      | Value                                                          |
 | ------------- | -------------------------------------------------------------- |
-| Image         | `dxflrs/garage`                                                |
+| Image         | `dxflrs/garage`, built through `Dockerfile`                    |
 | Architectures | x86_64, aarch64                                                |
 | Command       | `garage server`                                                |
 | Subcontainer  | `garage-sub` — the `garage` daemon, and the one to `attach` to |
@@ -104,7 +104,7 @@ Install does more here than in most packages, because a Garage cluster is not us
 
 1. **`passwd` and `group` are written**, since the image has neither.
 2. **`rpc_secret` is generated** into `garage.toml`.
-3. **The cluster is bootstrapped.** Garage is started in a temporary subcontainer; once its admin API port listens, its node id is read, a layout assigned to it in a single zone, and that layout applied. Cluster health is not used as the bootstrap gate: it cannot pass before a layout exists. This is reported as an install progress phase and is bounded at five minutes; if it does not succeed, init fails and StartOS rolls the install back.
+3. **The cluster is bootstrapped.** Garage is started in a temporary subcontainer, its node id read, a layout assigned to it in a single zone, and that layout applied. This is reported as an install progress phase and is bounded at five minutes; if it does not succeed, init fails and StartOS rolls the install back.
 4. **A `critical` task is raised** pointing at Set Admin Token — see [Tasks](#tasks).
 
 After that, the working order is: create an API key, create a bucket, then grant the key access to the bucket. A key with no grant can authenticate but sees nothing.

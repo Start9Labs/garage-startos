@@ -123,8 +123,6 @@ const dict = {
   '${keyId} (revoke): ${error}': 110,
   'my-bucket': 111,
   'my-app-key': 112,
-  'Garage is ready for setup': 113,
-  'Waiting for the Garage admin API': 114,
 } as const
 
 /**
