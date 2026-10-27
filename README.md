@@ -35,11 +35,11 @@
 
 ## Image and Container Runtime
 
-The upstream image is used unmodified, and one subcontainer runs the service.
+The upstream image is used with only `/etc` added (`Dockerfile`), since StartOS cannot start a subcontainer from an image without one and the scratch image ships none. One subcontainer runs the service.
 
 | Property      | Value                                                          |
 | ------------- | -------------------------------------------------------------- |
-| Image         | `dxflrs/garage`                                                |
+| Image         | `dxflrs/garage`, built through `Dockerfile`                    |
 | Architectures | x86_64, aarch64                                                |
 | Command       | `garage server`                                                |
 | Subcontainer  | `garage-sub` — the `garage` daemon, and the one to `attach` to |
@@ -140,7 +140,7 @@ Generates the token the admin API authenticates with. The action renames itself 
 
 ### Grant Bucket Access to Keys
 
-Sets the permissions one or more keys have on a bucket. No bucket is preselected. **Read** downloads and lists objects; **Write** uploads, replaces and deletes them; **Owner** changes the bucket's website and CORS settings and can delete the bucket. Each selected key is left with exactly the permissions turned on: one turned off is revoked if the key held it. At least one permission must be selected; the action refuses an empty grant rather than silently doing nothing. Partial failures are reported the same way as Delete Bucket's.
+Sets the permissions one or more keys have on a bucket. No bucket is preselected. **Read** downloads and lists objects; **Write** uploads, replaces and deletes them; **Owner** manages the bucket's website, CORS and lifecycle settings and can delete the bucket. Reading lifecycle settings also requires Owner. Each selected key is left with exactly the permissions turned on: one turned off is revoked if the key held it. At least one permission must be selected; the action refuses an empty grant rather than silently doing nothing. Partial failures are reported the same way as Delete Bucket's.
 
 This is the step that connects the two halves — a key and a bucket created separately have no relationship until it runs.
 

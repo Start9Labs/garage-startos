@@ -53,7 +53,7 @@ const dict = {
   'Each selected key is left with exactly the permissions turned on below. A permission it already had on this bucket is removed if it is turned off here.': 40,
   'Download and list the objects in the bucket.': 41,
   'Upload, replace and delete objects in the bucket.': 42,
-  "Change the bucket's website and CORS settings, and delete the bucket.": 43,
+  "Manage the bucket's website, CORS and lifecycle settings, and delete the bucket.": 43,
   'The name S3 clients use for this bucket. Lowercase letters, numbers, hyphens and dots.': 44,
   'A label to tell keys apart in lists. It is not part of the credentials.': 45,
   'Bucket Name': 46,
