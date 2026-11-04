@@ -24,4 +24,3 @@ Garage's source lives on Deuxfleurs' self-hosted Gitea (not GitHub); the release
 
 - In `Dockerfile`, set the `FROM` line to `dxflrs/garage:v<new version>`.
 - Re-check `parseBucketList` and `parseKeyList` in `startos/actions/utils.ts` against the tagged CLI's table columns.
-- Read the release's upgrade warnings even for a minor version: v2.5.0 automatically migrates the resync queue and forbids downgrades. Upstream performs this migration; do not duplicate it in a package migration.
