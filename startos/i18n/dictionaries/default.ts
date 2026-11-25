@@ -13,6 +13,8 @@ const dict = {
   'Garage administration API': 6,
   'S3 Web Hosting': 7,
   'Serves static websites from S3 buckets': 8,
+  'Web Admin': 113,
+  'Garage web interface for cluster administration': 114,
 
   // actions
   'Reset Admin Token': 9,

@@ -115,6 +115,8 @@ export default {
     110: '${keyId} (revocar): ${error}',
     111: 'mi-bucket',
     112: 'mi-clave-app',
+    113: 'Administración web',
+    114: 'Interfaz web de Garage para administrar el clúster',
   },
   de_DE: {
     0: 'Garage',
@@ -230,6 +232,8 @@ export default {
     110: '${keyId} (entziehen): ${error}',
     111: 'mein-bucket',
     112: 'mein-app-schluessel',
+    113: 'Web-Administration',
+    114: 'Garage-Weboberfläche zur Clusterverwaltung',
   },
   pl_PL: {
     0: 'Garage',
@@ -345,6 +349,8 @@ export default {
     110: '${keyId} (odebranie): ${error}',
     111: 'moj-bucket',
     112: 'moj-klucz-aplikacji',
+    113: 'Panel administracyjny',
+    114: 'Interfejs WWW Garage do administrowania klastrem',
   },
   fr_FR: {
     0: 'Garage',
@@ -460,5 +466,7 @@ export default {
     110: '${keyId} (révocation) : ${error}',
     111: 'mon-bucket',
     112: 'ma-cle-application',
+    113: 'Administration web',
+    114: 'Interface web de Garage pour administrer le cluster',
   },
 } satisfies Record<string, LangDict>

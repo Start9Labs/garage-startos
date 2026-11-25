@@ -57,7 +57,19 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
     query: {},
   })
 
-  const adminReceipt = await adminMultiOrigin.export([adminApi])
+  const webAdmin = sdk.createInterface(effects, {
+    name: i18n('Web Admin'),
+    id: 'webadmin',
+    description: i18n('Garage web interface for cluster administration'),
+    type: 'ui',
+    masked: false,
+    schemeOverride: null,
+    username: null,
+    path: '/ui/',
+    query: {},
+  })
+
+  const adminReceipt = await adminMultiOrigin.export([webAdmin, adminApi])
 
   return [s3Receipt, webReceipt, adminReceipt]
 })
