@@ -29,6 +29,10 @@ After install Garage posts a critical task asking you to set an admin API token.
 
 The **S3 API Interface** is the endpoint your S3 client connects to. Use the access key ID and secret key from **Create API Key** as the credentials and `garage` as the region. The Admin API uses the admin token from setup as a bearer credential.
 
+### Prometheus metrics
+
+Garage serves Prometheus metrics at `/metrics` on the **Admin API** interface. Run **Show Metrics Token** and configure your scraper to send that token as a bearer token (in Prometheus, `authorization: { credentials: <token> }`).
+
 ### Static website hosting
 
 Buckets configured for website hosting are served on the **S3 Web Hosting** interface. See the upstream book for the bucket configuration required to enable website mode.
@@ -38,6 +42,7 @@ Buckets configured for website hosting are served on the **S3 Web Hosting** inte
 Action forms, empty-list warnings, result labels and messages appear in your selected language (English, Spanish, German, Polish or French). Your bucket and key names, credentials, and Garage's own diagnostic output are not translated.
 
 - **Reset Admin Token** — generate a new admin API token, invalidating the previous one. Use it to rotate the token or recover if you've lost it.
+- **Show Metrics Token** — show the bearer token for scraping `/metrics` on the Admin API.
 - **Cluster Status** — show the healthy/unhealthy nodes in the cluster with their IDs, addresses, and roles.
 - **Create Bucket**, **List Buckets**, **Delete Bucket** — manage S3 buckets. Bucket names are 2–63 lowercase letters, numbers, hyphens or dots, starting and ending with a letter or number. Garage deletes only an empty bucket: remove its objects with your S3 client first.
 - **Create API Key**, **List API Keys**, **Delete API Key** — manage S3 access key / secret key pairs. The secret is shown once at creation; save it then.

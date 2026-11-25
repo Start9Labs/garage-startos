@@ -117,6 +117,10 @@ export default {
     112: 'mi-clave-app',
     113: 'Administración web',
     114: 'Interfaz web de Garage para administrar el clúster',
+    115: 'Mostrar token de métricas',
+    116: 'Mostrar el token de portador para recopilar las métricas de Prometheus de Garage',
+    117: 'Token de métricas',
+    118: 'Envíelo como token de portador al recopilar /metrics en la API de administración.',
   },
   de_DE: {
     0: 'Garage',
@@ -234,6 +238,10 @@ export default {
     112: 'mein-app-schluessel',
     113: 'Web-Administration',
     114: 'Garage-Weboberfläche zur Clusterverwaltung',
+    115: 'Metrik-Token anzeigen',
+    116: 'Das Bearer-Token zum Abrufen der Prometheus-Metriken von Garage anzeigen',
+    117: 'Metrik-Token',
+    118: 'Beim Abrufen von /metrics über die Admin-API als Bearer-Token senden.',
   },
   pl_PL: {
     0: 'Garage',
@@ -351,6 +359,10 @@ export default {
     112: 'moj-klucz-aplikacji',
     113: 'Panel administracyjny',
     114: 'Interfejs WWW Garage do administrowania klastrem',
+    115: 'Pokaż token metryk',
+    116: 'Pokaż token okaziciela do pobierania metryk Prometheus z Garage',
+    117: 'Token metryk',
+    118: 'Wysyłaj go jako token okaziciela podczas pobierania /metrics z API administracyjnego.',
   },
   fr_FR: {
     0: 'Garage',
@@ -468,5 +480,9 @@ export default {
     112: 'ma-cle-application',
     113: 'Administration web',
     114: 'Interface web de Garage pour administrer le cluster',
+    115: 'Afficher le jeton de métriques',
+    116: 'Afficher le jeton porteur pour collecter les métriques Prometheus de Garage',
+    117: 'Jeton de métriques',
+    118: 'Envoyez-le comme jeton porteur lors de la collecte de /metrics sur l’API d’administration.',
   },
 } satisfies Record<string, LangDict>

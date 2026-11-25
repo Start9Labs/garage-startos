@@ -60,11 +60,11 @@ The volume additionally supplies `/etc/passwd` and `/etc/group` as **individual 
 
 Three models. One is Garage's configuration; the other two are the account files just described.
 
-| File          | Format | Modelled                  | Written by                                            |
-| ------------- | ------ | ------------------------- | ----------------------------------------------------- |
-| `garage.toml` | TOML   | Yes — `FileHelper.toml`   | Install, every init, and the Reset Admin Token action |
-| `passwd`      | text   | Yes — `FileHelper.string` | Every init, unconditionally                           |
-| `group`       | text   | Yes — `FileHelper.string` | Every init, unconditionally                           |
+| File          | Format | Modelled                  | Written by                                                                   |
+| ------------- | ------ | ------------------------- | ---------------------------------------------------------------------------- |
+| `garage.toml` | TOML   | Yes — `FileHelper.toml`   | Install, every init, the 2.6.0:0 migration, and the Reset Admin Token action |
+| `passwd`      | text   | Yes — `FileHelper.string` | Every init, unconditionally                                                  |
+| `group`       | text   | Yes — `FileHelper.string` | Every init, unconditionally                                                  |
 
 ### garage.toml
 
@@ -73,6 +73,8 @@ Three models. One is Garage's configuration; the other two are the account files
 Two enforced values are worth naming because they encode the single-node decision: **`replication_factor` is pinned to 1 and `consistency_mode` to consistent.** Garage's distributed replication has nothing to replicate to here, and raising the factor on a one-node cluster would leave writes unable to satisfy their quorum.
 
 **Generated at install:** `rpc_secret`, a 64-character hex value. It is what cluster members would authenticate to each other with.
+
+**Generated at install, or by the 2.6.0:0 migration on an older install:** `admin.metrics_token`, a 32-character alphanumeric bearer token that `/metrics` on the admin API requires.
 
 **Yours:** `compression_level`, and `admin_token` through its action.
 
@@ -97,14 +99,14 @@ Four interfaces on three hosts, so S3, web hosting and administration can be exp
 
 The RPC port used between cluster members is bound inside the container but exported as no interface, because this is a single-node deployment.
 
-**The admin API and Web Admin are protected only by the admin token.** Exposing the admin host beyond the LAN hands full administrative control to anyone holding the token, so treat it accordingly — it is a separate host precisely so it can be left unexposed while the S3 API is not.
+**The admin API and Web Admin are protected only by the admin token.** `/metrics` takes the metrics token; `/health` and `/check` answer without one, by upstream design. Exposing the admin host beyond the LAN hands full administrative control to anyone holding the token, so treat it accordingly — it is a separate host precisely so it can be left unexposed while the S3 API is not.
 
 ## Installation and First-Run Flow
 
 Install does more here than in most packages, because a Garage cluster is not usable until it has a layout — and a single-node cluster still needs one.
 
 1. **`passwd` and `group` are written**, since the image has neither.
-2. **`rpc_secret` is generated** into `garage.toml`.
+2. **`rpc_secret` and the metrics token are generated** into `garage.toml`.
 3. **The cluster is bootstrapped.** Garage is started in a temporary subcontainer, its node id read, a layout assigned to it in a single zone, and that layout applied. This is reported as an install progress phase and is bounded at five minutes; if it does not succeed, init fails and StartOS rolls the install back.
 4. **A `critical` task is raised** pointing at Set Admin Token — see [Tasks](#tasks).
 
@@ -112,7 +114,7 @@ After that, the working order is: create an API key, create a bucket, then grant
 
 ## Actions
 
-Nine actions. All but one require the service to be running, since they drive Garage's own CLI against a live node.
+Ten actions. All but two require the service to be running, since they drive Garage's own CLI against a live node.
 
 ### Set / Reset Admin Token
 
@@ -122,6 +124,10 @@ Generates the token the admin API authenticates with. The action renames itself 
 - **Availability:** running or stopped, unlike the rest.
 - **Repeat safety:** safe to re-run, but **it invalidates the current token**; anything using the admin API must be updated.
 - **Outputs:** the token, masked and copyable, shown once.
+
+### Show Metrics Token
+
+Shows `admin.metrics_token` from `garage.toml`: the bearer token a Prometheus scraper sends to `/metrics` on the admin API. Read-only, available running or stopped, and safe to repeat. The token is generated at install and never rotated by the package.
 
 ### Create Bucket, List Buckets, Delete Bucket
 
@@ -173,7 +179,7 @@ It probes Garage's own health endpoint rather than only the port, so a pass mean
 
 The `main` volume is copied wholesale — `sdk.Backups.ofVolumes('main')`. No dump step and nothing excluded.
 
-- **Included:** every stored object, the metadata database, the cluster layout, `garage.toml` with the RPC secret and admin token, and the account files.
+- **Included:** every stored object, the metadata database, the cluster layout, `garage.toml` with the RPC secret, admin token and metrics token, and the account files.
 - **Restore:** complete, and no re-bootstrap happens — the layout is part of the backup, so the install-time bootstrap does not run again and the admin-token task is not raised. Buckets, keys, and grants all come back.
 
 The size implication is direct: the backup contains every object stored in every bucket.
@@ -183,7 +189,7 @@ The size implication is direct: the backup contains every object stored in every
 1. **Single node.** The replication factor is pinned to 1 and no RPC interface is exported; this package does not join or form a multi-node cluster.
 2. **Buckets and keys are managed through actions or the Web Admin UI.** The UI signs in with the admin token.
 3. **A key and a bucket are unrelated until granted.** Creating both is not enough to use them together.
-4. **The admin API's only protection is its token.** Exposing the admin host publicly exposes administrative control, through both the API and the Web Admin UI.
+4. **The admin API's only protection is its token.** Exposing the admin host publicly exposes administrative control, through both the API and the Web Admin UI. `/health` and `/check` on it need no token.
 5. **Only an empty bucket can be deleted**, and deleting a key immediately breaks anything using it. Neither deletion is reversible.
 6. **`passwd` and `group` are package-supplied and rewritten every init**, because the upstream image ships neither.
 7. **No riscv64 build.** x86_64 and aarch64 only.
@@ -218,6 +224,7 @@ interfaces:
   admin: { type: api, port: 3903 }
 actions:
   - reset-admin-token # renames itself to "Set Admin Token" when unset
+  - show-metrics-token
   - cluster-status
   - create-bucket
   - list-buckets
