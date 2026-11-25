@@ -1,4 +1,6 @@
 import { VersionInfo, IMPOSSIBLE } from '@start9labs/start-sdk'
+import { garageToml } from '../fileModels/garage.toml'
+import { randomToken } from '../utils'
 
 export const current = VersionInfo.of({
   version: '2.6.0:0',
@@ -11,6 +13,7 @@ export const current = VersionInfo.of({
 
 **Security**
 
+- Prometheus metrics on the Admin API now require a token. If you scrape them, run Show Metrics Token and add the token to your scraper as a bearer token.
 - Copying an object now respects bucket quotas
 - Fixed a crash from malformed browser-form uploads
 
@@ -30,6 +33,7 @@ export const current = VersionInfo.of({
 
 **Seguridad**
 
+- Las métricas de Prometheus de la API de administración ahora requieren un token. Si las recopila, ejecute Mostrar token de métricas y añada el token a su recolector como token de portador.
 - Copiar un objeto ahora respeta las cuotas del bucket
 - Corregido un fallo causado por subidas de formularios de navegador malformadas
 
@@ -49,6 +53,7 @@ export const current = VersionInfo.of({
 
 **Sicherheit**
 
+- Die Prometheus-Metriken der Admin-API erfordern jetzt ein Token. Wenn Sie sie abrufen, führen Sie „Metrik-Token anzeigen“ aus und hinterlegen Sie das Token in Ihrem Scraper als Bearer-Token.
 - Das Kopieren eines Objekts beachtet jetzt Bucket-Kontingente
 - Absturz durch fehlerhafte Browser-Formular-Uploads behoben
 
@@ -68,6 +73,7 @@ export const current = VersionInfo.of({
 
 **Bezpieczeństwo**
 
+- Metryki Prometheus w API administracyjnym wymagają teraz tokenu. Jeśli je pobierasz, uruchom „Pokaż token metryk” i dodaj token do swojego scrapera jako token okaziciela.
 - Kopiowanie obiektu uwzględnia teraz limity bucketa
 - Naprawiono awarię spowodowaną nieprawidłowymi przesyłaniami z formularzy przeglądarki
 
@@ -87,6 +93,7 @@ export const current = VersionInfo.of({
 
 **Sécurité**
 
+- Les métriques Prometheus de l’API d’administration exigent désormais un jeton. Si vous les collectez, exécutez « Afficher le jeton de métriques » et ajoutez le jeton à votre collecteur comme jeton porteur.
 - La copie d’un objet respecte désormais les quotas du bucket
 - Correction d’un plantage causé par des envois de formulaires navigateur malformés
 
@@ -100,7 +107,13 @@ export const current = VersionInfo.of({
 [Notes de version complètes du projet](https://git.deuxfleurs.fr/Deuxfleurs/garage/releases/tag/v2.6.0)`,
   },
   migrations: {
-    up: async ({ effects }) => {},
+    up: async ({ effects }) => {
+      if (!(await garageToml.read((c) => c.admin.metrics_token).once())) {
+        await garageToml.merge(effects, {
+          admin: { metrics_token: randomToken() },
+        })
+      }
+    },
     down: IMPOSSIBLE,
   },
 })

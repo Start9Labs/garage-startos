@@ -7,10 +7,12 @@ import { createApiKey } from './keys/create'
 import { deleteApiKey } from './keys/delete'
 import { grantBucketToKey } from './keys/grantBucketToKey'
 import { listApiKeys } from './keys/list'
+import { showMetricsToken } from './showMetricsToken'
 import { clusterStatus } from './status'
 
 export const actions = sdk.Actions.of()
   .addAction(resetAdminToken)
+  .addAction(showMetricsToken)
   .addAction(clusterStatus)
   .addAction(createBucket)
   .addAction(createApiKey)

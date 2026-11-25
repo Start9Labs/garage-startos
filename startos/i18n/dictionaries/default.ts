@@ -125,6 +125,10 @@ const dict = {
   '${keyId} (revoke): ${error}': 110,
   'my-bucket': 111,
   'my-app-key': 112,
+  'Show Metrics Token': 115,
+  "Show the bearer token for scraping Garage's Prometheus metrics": 116,
+  'Metrics Token': 117,
+  'Send this as a bearer token when scraping /metrics on the Admin API.': 118,
 } as const
 
 /**

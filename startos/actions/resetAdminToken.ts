@@ -1,7 +1,7 @@
-import { utils } from '@start9labs/start-sdk'
 import { garageToml } from '../fileModels/garage.toml'
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
+import { randomToken } from '../utils'
 
 export const resetAdminToken = sdk.Action.withoutInput(
   'reset-admin-token',
@@ -26,10 +26,7 @@ export const resetAdminToken = sdk.Action.withoutInput(
   },
 
   async ({ effects }) => {
-    const admin_token = utils.getDefaultString({
-      charset: 'a-z,A-Z,0-9',
-      len: 32,
-    })
+    const admin_token = randomToken()
 
     await garageToml.merge(effects, { admin: { admin_token } })
 

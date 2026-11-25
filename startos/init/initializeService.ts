@@ -8,6 +8,7 @@ import {
   garageHealthUrl,
   garageImageId,
   garageMounts,
+  randomToken,
 } from '../utils'
 
 // Install has to bootstrap the layout, not just start the daemon: a Garage node
@@ -23,6 +24,7 @@ export const initializeService = sdk.setupOnInit(
           charset: 'a-f,0-9',
           len: 64,
         }),
+        admin: { metrics_token: randomToken() },
       })
 
       const phase = progress.addPhase(i18n('Bootstrapping the Garage cluster'))
