@@ -86,17 +86,18 @@ None. Other services use Garage as an S3 backend by pointing at its API address 
 
 ## Network Access and Interfaces
 
-Three interfaces, each on its own host so they can be exposed independently.
+Four interfaces on three hosts, so S3, web hosting and administration can be exposed independently. The Web Admin UI and the Admin API share the admin host.
 
-| Interface      | Id      | Type | Port | Description                          |
-| -------------- | ------- | ---- | ---- | ------------------------------------ |
-| S3 API         | `s3`    | api  | 3900 | The S3-compatible object storage API |
-| S3 Web Hosting | `web`   | api  | 3902 | Serves static sites out of buckets   |
-| Admin API      | `admin` | api  | 3903 | Garage's administration API          |
+| Interface      | Id         | Type | Port | Description                                |
+| -------------- | ---------- | ---- | ---- | ------------------------------------------ |
+| S3 API         | `s3`       | api  | 3900 | The S3-compatible object storage API       |
+| S3 Web Hosting | `web`      | api  | 3902 | Serves static sites out of buckets         |
+| Web Admin      | `webadmin` | ui   | 3903 | Garage's built-in web UI, served at `/ui/` |
+| Admin API      | `admin`    | api  | 3903 | Garage's administration API                |
 
 The RPC port used between cluster members is bound inside the container but exported as no interface, because this is a single-node deployment.
 
-**The admin API is protected only by its token.** Exposing that interface beyond the LAN hands full administrative control to anyone holding the token, so treat it accordingly — it is a separate host precisely so it can be left unexposed while the S3 API is not.
+**The admin API and Web Admin are protected only by the admin token.** Exposing the admin host beyond the LAN hands full administrative control to anyone holding the token, so treat it accordingly — it is a separate host precisely so it can be left unexposed while the S3 API is not.
 
 ## Installation and First-Run Flow
 
@@ -180,9 +181,9 @@ The size implication is direct: the backup contains every object stored in every
 ## Limitations and Differences
 
 1. **Single node.** The replication factor is pinned to 1 and no RPC interface is exported; this package does not join or form a multi-node cluster.
-2. **Buckets and keys are managed through actions**, not through a web console — Garage ships none.
+2. **Buckets and keys are managed through actions or the Web Admin UI.** The UI signs in with the admin token.
 3. **A key and a bucket are unrelated until granted.** Creating both is not enough to use them together.
-4. **The admin API's only protection is its token.** Exposing that interface publicly exposes administrative control.
+4. **The admin API's only protection is its token.** Exposing the admin host publicly exposes administrative control, through both the API and the Web Admin UI.
 5. **Only an empty bucket can be deleted**, and deleting a key immediately breaks anything using it. Neither deletion is reversible.
 6. **`passwd` and `group` are package-supplied and rewritten every init**, because the upstream image ships neither.
 7. **No riscv64 build.** x86_64 and aarch64 only.
@@ -213,6 +214,7 @@ dependencies: []
 interfaces:
   s3: { type: api, port: 3900 }
   web: { type: api, port: 3902 }
+  webadmin: { type: ui, port: 3903, path: /ui/ }
   admin: { type: api, port: 3903 }
 actions:
   - reset-admin-token # renames itself to "Set Admin Token" when unset

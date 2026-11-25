@@ -8,7 +8,8 @@
 
 - An **S3 API Interface** at port `3900` that any S3-compatible client (AWS CLI, `s3cmd`, `rclone`, MinIO Client, etc.) can point at.
 - An **S3 Web Hosting** interface at port `3902` that serves static websites out of your buckets.
-- An **Admin API** interface at port `3903` for programmatic administration with the admin token.
+- A **Web Admin** interface at port `3903`: Garage's built-in web UI for managing buckets, keys, permissions and the cluster.
+- An **Admin API** interface on the same port for programmatic administration with the admin token.
 - A single-node Garage cluster: the layout, RPC secret, and replication settings are managed for you. You do not configure a database or bind addresses.
 
 ## Getting set up
@@ -19,6 +20,7 @@ After install Garage posts a critical task asking you to set an admin API token.
 2. Start Garage.
 3. Run **Create API Key** to mint an S3 access key / secret key pair, and **Create Bucket** to create your first bucket.
 4. Run **Grant Bucket Access to Keys** to authorise the key against the bucket (with read, write, and/or owner permissions).
+   You can do steps 3 and 4 in the **Web Admin** interface instead: sign in with the admin token.
 5. Point your S3 client at the **S3 API Interface** address using those credentials. The S3 region is `garage`.
 
 ## Using Garage

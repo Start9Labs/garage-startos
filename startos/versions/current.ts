@@ -1,33 +1,103 @@
 import { VersionInfo, IMPOSSIBLE } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '2.5.0:0',
+  version: '2.6.0:0',
   releaseNotes: {
-    en_US: `Updated Garage to 2.5.0 and the StartOS SDK to 3.1.1. Fixes crashes from malformed URLs and admin tokens, improves S3 checksum compatibility, and adds resync queue size to Cluster Status.
+    en_US: `Updated Garage to 2.6.0.
 
-Before updating, take a backup. Garage automatically migrates its resync queue on startup; startup time and metadata space usage may increase with the queue size. Do not downgrade after updating. Keys that read or change bucket lifecycle rules now need Owner permission; use Grant Bucket Access to Keys to grant it while retaining any required Read/Write permissions.
+**Features**
 
-[Full upstream release notes](https://git.deuxfleurs.fr/Deuxfleurs/garage/releases/tag/v2.5.0)`,
-    es_ES: `Actualizados Garage a 2.5.0 y el SDK de StartOS a 3.1.1. Corrige fallos por URL malformadas y tokens de administrador, mejora la compatibilidad de sumas de comprobación S3 y añade el tamaño de la cola de resincronización al estado del clúster.
+- New: Web Admin interface, Garage's built-in web UI for managing buckets, keys, permissions and the cluster. Sign in with your admin token.
 
-Antes de actualizar, haga una copia de seguridad. Garage migra automáticamente su cola de resincronización al arrancar; el tiempo de arranque y el uso de espacio de metadatos pueden aumentar con el tamaño de la cola. No vuelva a una versión anterior después de actualizar. Las claves que leen o cambian reglas de ciclo de vida de buckets ahora necesitan el permiso Propietario; concédalo mediante Conceder acceso de bucket a claves, conservando los permisos Lectura/Escritura necesarios.
+**Security**
 
-[Notas completas de la versión original](https://git.deuxfleurs.fr/Deuxfleurs/garage/releases/tag/v2.5.0)`,
-    de_DE: `Garage auf 2.5.0 und das StartOS-SDK auf 3.1.1 aktualisiert. Behebt Abstürze durch fehlerhafte URLs und Admin-Token, verbessert die S3-Prüfsummenkompatibilität und zeigt die Größe der Resync-Warteschlange im Clusterstatus.
+- Copying an object now respects bucket quotas
+- Fixed a crash from malformed browser-form uploads
 
-Vor dem Update eine Sicherung erstellen. Garage migriert seine Resync-Warteschlange beim Start automatisch; Startzeit und Metadaten-Speicherbedarf können mit der Warteschlangengröße steigen. Nach dem Update kein Downgrade durchführen. Schlüssel zum Lesen oder Ändern von Bucket-Lebenszyklusregeln benötigen jetzt Eigentümer-Rechte; diese über „Bucket-Zugriff für Schlüssel gewähren“ erteilen und benötigte Lesen/Schreiben-Rechte beibehalten.
+**Fixes**
 
-[Vollständige Upstream-Versionshinweise](https://git.deuxfleurs.fr/Deuxfleurs/garage/releases/tag/v2.5.0)`,
-    pl_PL: `Zaktualizowano Garage do 2.5.0 i SDK StartOS do 3.1.1. Naprawiono awarie spowodowane nieprawidłowymi adresami URL i tokenami administratora, poprawiono zgodność sum kontrolnych S3 i dodano rozmiar kolejki resynchronizacji do stanu klastra.
+- Fixed object listings that start after a key preceding the prefix
+- More reliable handling of cancelled uploads
+- Presigned URLs with unsigned checksum parameters are accepted
+- Compressed blocks are no longer stored when larger than the original
 
-Przed aktualizacją wykonaj kopię zapasową. Garage automatycznie migruje kolejkę resynchronizacji przy uruchomieniu; czas uruchamiania i zużycie miejsca na metadane mogą wzrosnąć wraz z rozmiarem kolejki. Po aktualizacji nie wracaj do starszej wersji. Klucze odczytujące lub zmieniające reguły cyklu życia bucketów wymagają teraz uprawnienia Właściciel; nadaj je przez „Przyznaj dostęp bucketa do kluczy”, zachowując wymagane uprawnienia Odczyt/Zapis.
+[Full upstream release notes](https://git.deuxfleurs.fr/Deuxfleurs/garage/releases/tag/v2.6.0)`,
+    es_ES: `Actualizado Garage a 2.6.0.
 
-[Pełne informacje o wydaniu upstream](https://git.deuxfleurs.fr/Deuxfleurs/garage/releases/tag/v2.5.0)`,
-    fr_FR: `Garage mis à jour vers 2.5.0 et le SDK StartOS vers 3.1.1. Corrige des plantages liés aux URL malformées et aux jetons administrateur, améliore la compatibilité des sommes de contrôle S3 et ajoute la taille de la file de resynchronisation à l’état du cluster.
+**Novedades**
 
-Avant la mise à jour, effectuez une sauvegarde. Garage migre automatiquement sa file de resynchronisation au démarrage ; le temps de démarrage et l’espace occupé par les métadonnées peuvent augmenter avec la taille de la file. Ne revenez pas à une version antérieure après la mise à jour. Les clés qui lisent ou modifient les règles de cycle de vie des buckets nécessitent désormais la permission Propriétaire ; accordez-la via « Accorder l’accès d’un bucket à des clés » en conservant les permissions Lecture/Écriture nécessaires.
+- Nuevo: interfaz Administración web, la interfaz web integrada de Garage para gestionar buckets, claves, permisos y el clúster. Inicie sesión con su token de administrador.
 
-[Notes de version complètes du projet](https://git.deuxfleurs.fr/Deuxfleurs/garage/releases/tag/v2.5.0)`,
+**Seguridad**
+
+- Copiar un objeto ahora respeta las cuotas del bucket
+- Corregido un fallo causado por subidas de formularios de navegador malformadas
+
+**Correcciones**
+
+- Corregidos los listados de objetos que empiezan tras una clave anterior al prefijo
+- Gestión más fiable de las subidas canceladas
+- Se aceptan URL prefirmadas con parámetros de suma de comprobación sin firmar
+- Los bloques comprimidos ya no se almacenan cuando son más grandes que el original
+
+[Notas completas de la versión original](https://git.deuxfleurs.fr/Deuxfleurs/garage/releases/tag/v2.6.0)`,
+    de_DE: `Garage auf 2.6.0 aktualisiert.
+
+**Funktionen**
+
+- Neu: Schnittstelle Web-Administration, die integrierte Weboberfläche von Garage zur Verwaltung von Buckets, Schlüsseln, Berechtigungen und dem Cluster. Mit dem Admin-Token anmelden.
+
+**Sicherheit**
+
+- Das Kopieren eines Objekts beachtet jetzt Bucket-Kontingente
+- Absturz durch fehlerhafte Browser-Formular-Uploads behoben
+
+**Fehlerbehebungen**
+
+- Objektlisten, die nach einem Schlüssel vor dem Präfix beginnen, korrigiert
+- Zuverlässigere Behandlung abgebrochener Uploads
+- Vorsignierte URLs mit unsignierten Prüfsummenparametern werden akzeptiert
+- Komprimierte Blöcke werden nicht mehr gespeichert, wenn sie größer als das Original sind
+
+[Vollständige Upstream-Versionshinweise](https://git.deuxfleurs.fr/Deuxfleurs/garage/releases/tag/v2.6.0)`,
+    pl_PL: `Zaktualizowano Garage do 2.6.0.
+
+**Nowości**
+
+- Nowy: interfejs Panel administracyjny, wbudowany interfejs WWW Garage do zarządzania bucketami, kluczami, uprawnieniami i klastrem. Zaloguj się tokenem administratora.
+
+**Bezpieczeństwo**
+
+- Kopiowanie obiektu uwzględnia teraz limity bucketa
+- Naprawiono awarię spowodowaną nieprawidłowymi przesyłaniami z formularzy przeglądarki
+
+**Poprawki**
+
+- Naprawiono listowanie obiektów zaczynające się po kluczu poprzedzającym prefiks
+- Bardziej niezawodna obsługa anulowanych przesyłań
+- Akceptowane są adresy URL z podpisem wstępnym zawierające niepodpisane parametry sum kontrolnych
+- Skompresowane bloki nie są już zapisywane, gdy są większe niż oryginał
+
+[Pełne informacje o wydaniu upstream](https://git.deuxfleurs.fr/Deuxfleurs/garage/releases/tag/v2.6.0)`,
+    fr_FR: `Garage mis à jour vers 2.6.0.
+
+**Fonctionnalités**
+
+- Nouveau : interface Administration web, l’interface web intégrée de Garage pour gérer les buckets, les clés, les permissions et le cluster. Connectez-vous avec votre jeton administrateur.
+
+**Sécurité**
+
+- La copie d’un objet respecte désormais les quotas du bucket
+- Correction d’un plantage causé par des envois de formulaires navigateur malformés
+
+**Corrections**
+
+- Correction des listes d’objets commençant après une clé antérieure au préfixe
+- Gestion plus fiable des envois annulés
+- Les URL présignées avec des paramètres de somme de contrôle non signés sont acceptées
+- Les blocs compressés ne sont plus stockés lorsqu’ils sont plus gros que l’original
+
+[Notes de version complètes du projet](https://git.deuxfleurs.fr/Deuxfleurs/garage/releases/tag/v2.6.0)`,
   },
   migrations: {
     up: async ({ effects }) => {},
